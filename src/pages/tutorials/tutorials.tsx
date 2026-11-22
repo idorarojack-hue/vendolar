@@ -51,7 +51,7 @@ const TutorialsTab = observer(({ handleTabChange }: TTutorialsTab) => {
             content: (
                 <GuideContent
                     is_dialog_open={is_dialog_open}
-                    guide_tab_content={guide_tab_content()}
+                    guide_tab_content={[]} /* step-by-step tours removed on purpose */
                     video_tab_content={video_tab_content()}
                 />
             ),
@@ -70,7 +70,7 @@ const TutorialsTab = observer(({ handleTabChange }: TTutorialsTab) => {
                 <>
                     <GuideContent
                         is_dialog_open={is_dialog_open}
-                        guide_tab_content={guide_tab_content()}
+                        guide_tab_content={[]} /* step-by-step tours removed on purpose */
                         video_tab_content={video_tab_content()}
                     />
                     <FAQContent faq_list={faq_tab_content()} />
