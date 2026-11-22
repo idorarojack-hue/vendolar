@@ -1,0 +1,2808 @@
+@use 'components/shared/styles/mixins' as *;
+
+// Shared styles for Vindolar tool pages and the automated-session panel.
+$vd-navy: var(--vd-orange);
+$vd-navy-dark: var(--vd-border-strong);
+$vd-teal: var(--vd-orange);
+$vd-teal-dark: var(--vd-orange-text);
+$vd-red: var(--vd-down);
+$vd-amber: var(--vd-warn);
+
+.vd-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.is-up {
+    color: $vd-teal-dark;
+}
+
+.is-down {
+    color: $vd-red;
+}
+
+// ---------------------------------------------------------------------------
+// Page frame
+// ---------------------------------------------------------------------------
+.vd-page {
+    width: 100%;
+    height: calc(100vh - 17rem);
+    overflow-y: auto;
+    padding: 1.6rem 0 6rem;
+    background: var(--general-section-1);
+    border-radius: 0 0 1.2rem 1.2rem;
+
+    @include mobile-or-tablet-screen {
+        height: auto;
+        min-height: calc(100vh - 12rem);
+        padding: 1.2rem 1.2rem 9rem;
+        border-radius: 0;
+    }
+
+    &__header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem 2rem;
+        margin-bottom: 1.2rem;
+
+        h2 {
+            color: var(--text-prominent);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--vd-text-muted);
+            font-size: 1.3rem;
+        }
+    }
+
+    &__note {
+        margin-bottom: 1.6rem;
+        padding: 1rem 1.4rem;
+        border-inline-start: 4px solid $vd-amber;
+        border-radius: 0.6rem;
+        background: rgb(245 158 11 / 10%);
+        color: var(--text-general);
+        font-size: 1.3rem;
+        line-height: 1.5;
+    }
+
+    &__columns {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 44rem);
+        gap: 1.6rem;
+        align-items: start;
+
+        @include mobile-or-tablet-screen {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+        gap: 1.6rem;
+
+        @include mobile-screen {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+.vd-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.6rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 1.2rem;
+    background: var(--general-main-1);
+    min-width: 0;
+
+    &__title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        color: var(--text-prominent);
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    &__text {
+        color: var(--text-general);
+        font-size: 1.3rem;
+        line-height: 1.5;
+    }
+
+    &__badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 10rem;
+        background: rgb(50 23 7 / 10%);
+        color: $vd-navy;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+
+        &--teal {
+            background: rgb(255 145 54 / 15%);
+            color: $vd-teal-dark;
+        }
+
+        &--amber {
+            background: rgb(245 158 11 / 18%);
+            color: #b45309;
+        }
+    }
+
+    &--active {
+        border-color: $vd-teal;
+        box-shadow: 0 0 0 1px $vd-teal;
+    }
+}
+
+.vd-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    align-items: flex-end;
+
+    > * {
+        flex: 1 1 14rem;
+    }
+}
+
+.vd-chip-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    button {
+        padding: 0.6rem 1.1rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 10rem;
+        background: transparent;
+        color: var(--text-general);
+        font-size: 1.3rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &.is-active {
+            border-color: $vd-navy;
+            background: $vd-navy;
+            color: #fff;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $vd-teal;
+            outline-offset: 2px;
+        }
+    }
+}
+
+.vd-primary-button {
+    min-height: 4.4rem;
+    padding: 0 2rem;
+    border: none;
+    border-radius: 0.8rem;
+    background: $vd-navy;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+        filter: brightness(1.15);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &--teal {
+        background: $vd-teal-dark;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Inputs
+// ---------------------------------------------------------------------------
+.vd-number {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+
+    &__box {
+        display: flex;
+        align-items: center;
+        height: 4rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 0.6rem;
+        background: var(--general-main-1);
+
+        &:focus-within {
+            border-color: $vd-teal;
+        }
+
+        &--disabled {
+            opacity: 0.6;
+        }
+
+        input {
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+            padding: 0 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-prominent);
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+
+    &__unit {
+        padding-inline-end: 1rem;
+        color: var(--vd-text-muted);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    &__hint {
+        color: var(--vd-text-muted);
+        font-size: 1.1rem;
+    }
+}
+
+.vd-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    height: 4rem;
+    color: var(--text-prominent);
+    font-size: 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    input {
+        position: absolute;
+        opacity: 0;
+    }
+
+    &__track {
+        position: relative;
+        width: 4.4rem;
+        height: 2.4rem;
+        border-radius: 10rem;
+        background: var(--border-normal);
+        transition: background-color 0.15s ease;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0.3rem;
+            inset-inline-start: 0.3rem;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 50%;
+            background: #fff;
+            transition: transform 0.15s ease;
+        }
+    }
+
+    input:checked + &__track {
+        background: $vd-teal;
+
+        &::after {
+            transform: translateX(2rem);
+        }
+    }
+
+    input:focus-visible + &__track {
+        outline: 2px solid $vd-navy;
+        outline-offset: 2px;
+    }
+
+    &--disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.vd-select {
+    min-height: 4rem;
+    padding: 0 1rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 0.6rem;
+    background: var(--general-main-1);
+    color: var(--text-prominent);
+    font-size: 1.4rem;
+
+    &:focus-visible {
+        outline: 2px solid $vd-teal;
+        outline-offset: 1px;
+    }
+}
+
+.vd-message {
+    padding: 1rem 1.2rem;
+    border-radius: 0.8rem;
+    font-size: 1.3rem;
+    line-height: 1.4;
+
+    &--error {
+        background: rgb(240 106 80 / 12%);
+        color: var(--vd-down);
+    }
+
+    &--info {
+        background: rgb(255 145 54 / 12%);
+        color: $vd-teal-dark;
+    }
+}
+
+.vd-real-confirm {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 1rem 1.2rem;
+    border: 1px solid rgb(240 106 80 / 35%);
+    border-radius: 0.8rem;
+    color: var(--text-general);
+    font-size: 1.3rem;
+    line-height: 1.4;
+    cursor: pointer;
+
+    input {
+        margin-top: 0.2rem;
+        accent-color: $vd-red;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Automated session panel
+// ---------------------------------------------------------------------------
+.vd-session {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+
+    &__controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.2rem;
+    }
+
+    &__start,
+    &__stop {
+        min-width: 16rem;
+        min-height: 4.8rem;
+        padding: 0 2.4rem;
+        border: none;
+        border-radius: 0.8rem;
+        color: #fff;
+        font-size: 1.6rem;
+        font-weight: 800;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        &:focus-visible {
+            outline: 3px solid $vd-amber;
+            outline-offset: 2px;
+        }
+    }
+
+    &__start {
+        background: $vd-teal;
+    }
+
+    &__stop {
+        background: $vd-red;
+    }
+
+    &__reset {
+        border: none;
+        background: none;
+        color: var(--vd-text-muted);
+        font-size: 1.3rem;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    &__status {
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem 0.8rem;
+        min-width: 20rem;
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+        font-weight: 600;
+
+        small {
+            flex-basis: 100%;
+            padding-inline-start: 1.8rem;
+            color: var(--vd-text-muted);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+    }
+
+    &__dot {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: #94a3b8;
+
+        &--waiting,
+        &--in_trade,
+        &--buying {
+            background: $vd-teal;
+            animation: vd-session-pulse 1.4s ease-in-out infinite;
+        }
+
+        &--stopping {
+            background: $vd-amber;
+        }
+
+        &--stopped {
+            background: $vd-red;
+        }
+    }
+
+    &--compact {
+        gap: 1rem;
+    }
+}
+
+@keyframes vd-session-pulse {
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@keyframes vd-scanner-sweep {
+    0% {
+        transform: translateY(-120%);
+    }
+
+    100% {
+        transform: translateY(280%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-scanner-fab__beam {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-session__dot {
+        animation: none !important;
+    }
+}
+
+.vd-session-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1.2rem;
+
+    &--compact {
+        grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+        gap: 0.8rem;
+    }
+}
+
+.vd-session-stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.8rem;
+
+    @include mobile-or-tablet-screen {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    div {
+        padding: 1rem;
+        border-radius: 0.8rem;
+        background: var(--general-section-1);
+        min-width: 0;
+    }
+
+    dt {
+        color: var(--vd-text-muted);
+        font-size: 1.1rem;
+    }
+
+    dd {
+        overflow: hidden;
+        color: var(--text-prominent);
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &.is-up {
+            color: $vd-teal-dark;
+        }
+
+        &.is-down {
+            color: $vd-red;
+        }
+    }
+}
+
+.vd-session--compact .vd-session-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.vd-trade-log {
+    overflow-x: auto;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 1.3rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    th {
+        padding: 0.6rem 0.8rem;
+        border-bottom: 1px solid var(--border-normal);
+        color: var(--vd-text-muted);
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: start;
+        text-transform: uppercase;
+    }
+
+    td {
+        padding: 0.6rem 0.8rem;
+        border-bottom: 1px solid var(--general-section-1);
+        color: var(--text-prominent);
+        white-space: nowrap;
+    }
+
+    &__empty {
+        color: var(--vd-text-muted);
+        font-size: 1.3rem;
+    }
+}
+
+// Digit picker (also used by the Manual Trader)
+.vd-digit-picker {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+
+    button {
+        height: 3.6rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 0.6rem;
+        background: transparent;
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+        font-weight: 700;
+        cursor: pointer;
+
+        &.is-active {
+            border-color: $vd-teal;
+            background: $vd-teal;
+            color: #fff;
+        }
+
+        &:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $vd-navy;
+            outline-offset: 1px;
+        }
+    }
+}
+
+.vd-page__grid--wide {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 46rem), 1fr));
+}
+
+// Live "is the rule's condition met right now?" box
+.vd-rule-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem 1.2rem;
+    border-radius: 0.8rem;
+    background: var(--general-section-1);
+    color: var(--text-general);
+    font-size: 1.3rem;
+
+    strong {
+        color: var(--vd-text-muted);
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    &--met {
+        background: rgb(255 145 54 / 12%);
+
+        strong {
+            color: $vd-teal-dark;
+        }
+    }
+}
+
+.vd-bulk__quote {
+    color: var(--vd-orange-text);
+    font-family: var(--brand-font-monospace);
+    font-size: 2.8rem;
+    font-variant-numeric: tabular-nums;
+}
+
+// Bulk Trader: three vertical screens under the title — market, order, auto trade.
+.vd-page.vd-bulk {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-bottom: 1.2rem;
+
+    .vd-tool-hero {
+        flex: none;
+        margin-bottom: 1.2rem;
+        padding: 1.4rem 1.8rem;
+    }
+
+    @include mobile-or-tablet-screen {
+        height: auto;
+        overflow: auto;
+    }
+}
+
+.vd-bulk__board {
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(28rem, 0.95fr);
+    gap: 1.2rem;
+    min-height: 0;
+
+    @include mobile-or-tablet-screen {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vd-bulk__col,
+.vd-bulk__stack {
+    min-height: 0;
+    overflow: auto;
+}
+
+.vd-bulk__stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.vd-bulk .vd-digits-wide .vd-digits {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.8rem 0.2rem;
+}
+
+.vd-bulk__market {
+    gap: 1.4rem;
+}
+
+.vd-bulk__market-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    span {
+        color: var(--vd-orange-text);
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    strong {
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+}
+
+.vd-bulk__controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    > :first-child,
+    .vd-bulk__digit {
+        grid-column: 1 / -1;
+    }
+}
+
+.vd-bulk__digits,
+.vd-bulk__tape {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1.2rem;
+    border: 1px solid rgb(247 244 242 / 10%);
+    border-radius: 1rem;
+    background: rgb(0 0 0 / 22%);
+}
+
+.vd-bulk__tape .vd-last-digits {
+    gap: 0.5rem;
+}
+
+.vd-bulk__tape .vd-last-digits__chip {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 0.7rem;
+    font-size: 1.4rem;
+}
+
+// One row of 10 digit rings on wide cards, 5 per row on phones
+.vd-digits-wide .vd-digits {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+
+    @include mobile-screen {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+// Pattern Bots cards
+.vd-preset-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+}
+
+.vd-preset {
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    &__facts {
+        display: grid;
+        gap: 0.4rem;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid var(--general-section-1);
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 1.2rem;
+        }
+
+        dt {
+            color: var(--vd-text-muted);
+        }
+
+        dd {
+            color: var(--text-prominent);
+            font-weight: 600;
+        }
+    }
+
+    &__open {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+// Market Scanner
+.vd-scanner {
+    tr.is-ready td {
+        background: rgb(255 145 54 / 10%);
+    }
+
+    td strong {
+        display: block;
+        font-size: 1.3rem;
+    }
+
+    &__live {
+        color: $vd-teal-dark;
+        font-size: 1.1rem;
+    }
+
+    &__num {
+        font-family: var(--brand-font-monospace);
+    }
+
+    &__pill {
+        padding: 0.3rem 0.8rem;
+        border-radius: 10rem;
+        background: var(--general-section-1);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    &__flag {
+        padding: 0.3rem 0.8rem;
+        border-radius: 10rem;
+        background: rgb(240 106 80 / 10%);
+        color: var(--vd-down);
+        font-size: 1.2rem;
+        font-weight: 700;
+
+        &.is-on {
+            background: rgb(255 145 54 / 18%);
+            color: $vd-teal-dark;
+        }
+    }
+
+    &__toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    &__filter {
+        flex: 1 1 20rem;
+        margin-inline-start: auto;
+    }
+}
+
+// Hedging Tool
+.vd-hedge-leg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.4rem;
+    border-radius: 1rem;
+    color: #fff;
+
+    strong {
+        font-size: 1.8rem;
+    }
+
+    .vd-field__label {
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: 800;
+    }
+
+    small {
+        color: rgb(255 255 255 / 85%);
+        font-size: 1.2rem;
+    }
+
+    &--up {
+        background: var(--vd-orange);
+    }
+
+    &--down {
+        background: var(--vd-orange);
+    }
+
+    &__payout {
+        font-size: 2.2rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.vd-hedge__execute {
+    min-height: 5.2rem;
+    background: #f59e0b;
+    color: #1f2937;
+    font-size: 1.6rem;
+}
+
+.vd-hedge__ev {
+    color: var(--text-prominent);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+// Signals feed
+.vd-signal-list {
+    display: grid;
+    gap: 0.6rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.vd-signal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border-normal);
+    border-inline-start: 4px solid $vd-navy;
+    border-radius: 0.8rem;
+    font-size: 1.3rem;
+
+    > div:first-child {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem 1rem;
+        color: var(--text-general);
+
+        strong {
+            color: var(--text-prominent);
+        }
+    }
+
+    &--parity_streak,
+    &--half_streak {
+        border-inline-start-color: $vd-amber;
+    }
+
+    &--imbalance {
+        border-inline-start-color: $vd-teal;
+    }
+
+    &--cold_digit {
+        border-inline-start-color: #3b82f6;
+    }
+
+    &--hot_digit {
+        border-inline-start-color: $vd-red;
+    }
+
+    &__side {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        time {
+            color: var(--vd-text-muted);
+            font-size: 1.2rem;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+}
+
+.vd-signal-toggles {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.vd-hidden {
+    display: none !important;
+}
+
+// ---------------------------------------------------------------------------
+// Global corner: risk disclaimer + running sessions
+// ---------------------------------------------------------------------------
+.vd-global {
+    position: fixed;
+    inset-inline-start: 1.6rem;
+    bottom: 0.4rem;
+    z-index: 11;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.8rem;
+
+    @include mobile-or-tablet-screen {
+        inset-inline-start: 1rem;
+        bottom: 1rem;
+
+        &--above-bar {
+            bottom: 8.4rem;
+        }
+    }
+
+    &__risk {
+        height: 3.2rem;
+        padding: 0 1.2rem;
+        border: none;
+        border-radius: 0.5rem;
+        background: var(--vd-warn);
+        color: var(--vd-on-warn);
+        font-size: 1.2rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+
+        &:focus-visible {
+            outline: 2px solid $vd-amber;
+            outline-offset: 2px;
+        }
+    }
+
+    &__sessions {
+        position: relative;
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        height: 2.8rem;
+        padding: 0 1.2rem;
+        border: 1px solid rgb(255 145 54 / 50%);
+        border-radius: 10rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+        white-space: nowrap;
+    }
+
+    &__list {
+        position: absolute;
+        bottom: calc(100% + 0.8rem);
+        inset-inline-start: 0;
+        width: min(36rem, calc(100vw - 2rem));
+        padding: 1.2rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 1rem;
+        background: var(--general-main-1);
+        box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+
+        ul {
+            display: grid;
+            gap: 0.8rem;
+            margin: 0 0 0.8rem;
+            padding: 0;
+            list-style: none;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            > div {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                min-width: 0;
+                font-size: 1.3rem;
+
+                strong {
+                    overflow: hidden;
+                    color: var(--text-prominent);
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                small {
+                    color: var(--vd-text-muted);
+                    font-size: 1.1rem;
+                }
+            }
+        }
+    }
+
+    &__stop {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.6rem;
+        background: $vd-red;
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+        }
+
+        &--all {
+            width: 100%;
+            padding: 0.8rem;
+        }
+    }
+}
+
+// Simple accessible dialog
+.vd-dialog__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 1.6rem;
+    background: rgb(5 4 12 / 78%);
+}
+
+.vd-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: min(56rem, 100%);
+    max-height: calc(100vh - 3.2rem);
+    overflow-y: auto;
+    padding: 2.8rem;
+    border: 1px solid #754013;
+    border-radius: 1.4rem;
+    background: #2a1406;
+    color: #ddd6cf;
+    font-size: 1.4rem;
+    line-height: 1.6;
+    box-shadow: 0 25px 90px rgb(0 0 0 / 55%);
+
+    h2 {
+        color: var(--vd-orange-text);
+        font-family: var(--vd-font-display);
+        font-size: 2.4rem;
+        font-weight: 700;
+    }
+
+    .vd-primary-button {
+        border-radius: 0.8rem;
+        background: var(--vd-orange);
+        color: var(--vd-on-orange);
+    }
+
+    ul {
+        display: grid;
+        gap: 0.6rem;
+        padding-inline-start: 2rem;
+    }
+
+    li {
+        list-style: disc;
+    }
+
+    .vd-primary-button {
+        align-self: flex-end;
+    }
+}
+
+// Navigation strip arrows (desktop)
+.vd-strip-arrow {
+    position: absolute;
+    top: 0;
+    z-index: 3;
+    width: 3.6rem;
+    border: none;
+    color: #fff;
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+
+    &--left {
+        inset-inline-start: 0;
+        border-radius: 1.2rem 0 0;
+        background: var(--vd-bar);
+    }
+
+    &--right {
+        inset-inline-end: 0;
+        border-radius: 0 1.2rem 0 0;
+        background: var(--vd-bar);
+    }
+
+    &:hover {
+        color: var(--vd-orange);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--vd-orange);
+        outline-offset: -2px;
+    }
+}
+
+// Reports
+.vd-reports__desc {
+    max-width: 48rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap !important;
+}
+
+.vd-reports__pager {
+    align-items: center;
+    justify-content: space-between;
+
+    > * {
+        flex: 0 0 auto;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Floating Scanner
+// ---------------------------------------------------------------------------
+.vd-scanner-fab {
+    position: fixed;
+    inset-inline-end: 1.6rem;
+    bottom: 4.6rem;
+    z-index: 12;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    height: 4.8rem;
+    padding: 0 1.8rem 0 1.4rem;
+    border: none;
+    border-radius: 10rem;
+    background: $vd-navy;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow:
+        0 6px 18px rgb(11 31 77 / 45%),
+        0 0 0 3px rgb(255 145 54 / 45%);
+
+    &__icon {
+        position: relative;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        width: 3.6rem;
+        height: 3.6rem;
+        border-radius: 50%;
+        background: #120818;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+    }
+
+    &__beam {
+        position: absolute;
+        inset-inline: 0;
+        top: 0;
+        height: 38%;
+        background: linear-gradient(180deg, transparent, rgb(255 255 255 / 72%), transparent);
+        mix-blend-mode: screen;
+        animation: vd-scanner-sweep 1.6s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    &:hover {
+        filter: brightness(1.12);
+    }
+
+    &:focus-visible {
+        outline: 3px solid $vd-amber;
+        outline-offset: 3px;
+    }
+
+    &.is-open {
+        box-shadow: 0 0 0 3px $vd-teal;
+    }
+
+    @include mobile-or-tablet-screen {
+        bottom: 1rem;
+        height: 4.4rem;
+
+        &--lifted {
+            bottom: 8.4rem;
+        }
+    }
+}
+
+.vd-scanner-panel {
+    position: fixed;
+    inset-inline-end: 1.6rem;
+    bottom: 10.4rem;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: min(42rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 20rem);
+    overflow-y: auto;
+    padding: 1.6rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 1.4rem;
+    background: var(--general-main-1);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 25%);
+
+    &:focus {
+        outline: none;
+    }
+
+    @include mobile-or-tablet-screen {
+        inset-inline: 1rem;
+        bottom: 6rem;
+        width: auto;
+        max-height: calc(100vh - 16rem);
+
+        &--lifted {
+            bottom: 13.4rem;
+            max-height: calc(100vh - 23rem);
+        }
+    }
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        h2 {
+            color: var(--text-prominent);
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+    }
+
+    &__close {
+        width: 3.2rem;
+        height: 3.2rem;
+        border: none;
+        border-radius: 50%;
+        background: var(--general-section-1);
+        color: var(--text-prominent);
+        font-size: 2rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    &__list {
+        display: grid;
+        gap: 0.6rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.4rem 1rem;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-normal);
+            border-radius: 0.8rem;
+        }
+    }
+
+    &__row-main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        font-size: 1.3rem;
+
+        strong {
+            color: var(--text-prominent);
+        }
+
+        span {
+            color: var(--text-general);
+        }
+
+        small {
+            color: var(--vd-text-muted);
+            font-size: 1.1rem;
+        }
+    }
+
+    &__score {
+        padding: 0.4rem 0.8rem;
+        border-radius: 10rem;
+        background: var(--general-section-1);
+        color: var(--text-prominent);
+        font-size: 1.3rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+
+        &.is-high {
+            background: rgb(245 158 11 / 20%);
+            color: #b45309;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        grid-column: 1 / -1;
+        gap: 1.6rem;
+    }
+
+    &__quick {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+// Keep the Scanner clear of the run panel drawer (366px) on Bot Builder / Chart
+.vd-scanner-fab--beside-drawer,
+.vd-scanner-panel--beside-drawer {
+    @include desktop-screen {
+        inset-inline-end: calc(366px + 1.6rem);
+    }
+}
+
+// ===========================================================================
+// Dark immersive theme for automation tool pages: <div class="vd-page vd-page--dark">
+// ===========================================================================
+$vd-ink: var(--vd-text);
+$vd-ink-soft: var(--vd-muted);
+$vd-glass: var(--vd-panel);
+$vd-glass-strong: var(--vd-panel);
+$vd-line: var(--vd-border);
+$vd-line-soft: var(--vd-border-soft);
+$vd-cyan: var(--vd-cyan);
+$vd-teal-light: var(--vd-orange);
+
+.vd-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.vd-page--dark {
+    position: relative;
+    isolation: isolate;
+    background: var(--vd-bg);
+    color: $vd-ink;
+
+    > *:not(.vd-backdrop) {
+        position: relative;
+        z-index: 1;
+    }
+
+    // Text
+    .vd-card__title,
+    .vd-page__header h2,
+    h3 {
+        color: #fff;
+    }
+
+    .vd-card__text,
+    .vd-page__header p,
+    .vd-number__hint,
+    .vd-trade-log__empty {
+        color: $vd-ink-soft;
+    }
+
+    .vd-field__label {
+        color: rgb(255 145 54 / 80%);
+    }
+
+    // Cards: glass with a faint teal edge
+    .vd-card {
+        border: 1px solid $vd-line;
+        background: $vd-glass-strong;
+        box-shadow:
+            0 0 0 1px rgb(255 255 255 / 2%) inset,
+            0 18px 40px rgb(0 0 0 / 35%);
+        backdrop-filter: blur(8px);
+
+        &--active {
+            border-color: $vd-teal-light;
+            box-shadow:
+                0 0 0 1px $vd-teal-light,
+                0 0 28px rgb(255 145 54 / 30%);
+        }
+    }
+
+    .vd-card__badge {
+        background: rgb(255 145 54 / 12%);
+        color: $vd-teal-light;
+
+        &--amber {
+            background: rgb(245 158 11 / 16%);
+            color: #fbbf24;
+        }
+
+        &--teal {
+            background: rgb(21 201 239 / 18%);
+            color: $vd-cyan;
+        }
+    }
+
+    .vd-page__note {
+        border-inline-start-color: #fbbf24;
+        background: rgb(245 158 11 / 8%);
+        color: $vd-ink-soft;
+    }
+
+    // Inputs
+    .vd-number__box,
+    .vd-select {
+        border-color: $vd-line-soft;
+        background: rgb(255 255 255 / 5%);
+        color: #fff;
+
+        &:focus-within,
+        &:focus-visible {
+            border-color: $vd-cyan;
+            box-shadow: 0 0 0 3px rgb(21 201 239 / 18%);
+        }
+
+        input {
+            color: #fff;
+        }
+
+        option,
+        optgroup {
+            background: var(--vd-bar);
+            color: #fff;
+        }
+    }
+
+    .vd-number__unit {
+        color: $vd-ink-soft;
+    }
+
+    .vd-chip-select button,
+    .vd-digit-picker button,
+    .vd-segmented button {
+        border-color: $vd-line-soft;
+        color: $vd-ink;
+
+        &.is-active {
+            border-color: transparent;
+            background: var(--vd-orange);
+            color: #fff;
+            box-shadow: 0 0 14px rgb(21 201 239 / 35%);
+        }
+    }
+
+    .vd-segmented {
+        background: rgb(255 255 255 / 5%);
+        box-shadow: inset 0 0 0 1px $vd-line-soft;
+    }
+
+    .vd-switch {
+        color: #fff;
+    }
+
+    .vd-switch__track {
+        background: rgb(255 255 255 / 16%);
+    }
+
+    // Digit circles on dark
+    .vd-digit__disc {
+        fill: rgb(255 255 255 / 6%);
+    }
+
+    .vd-digit__track {
+        stroke: rgb(255 255 255 / 12%);
+    }
+
+    .vd-digit__label strong {
+        color: #fff;
+    }
+
+    .vd-digit__label small {
+        color: $vd-ink-soft;
+    }
+
+    .vd-last-digits__chip--even:not(.vd-last-digits__chip--latest) {
+        color: var(--vd-up);
+    }
+
+    .vd-last-digits__chip--odd:not(.vd-last-digits__chip--latest) {
+        color: var(--vd-down);
+    }
+
+    // Stats, tables, previews
+    .vd-session-stats > div,
+    .vd-preset__facts,
+    .vd-rule-preview {
+        background: rgb(255 255 255 / 5%);
+    }
+
+    .vd-session-stats dt,
+    .vd-preset__facts dt,
+    .vd-trade-log th {
+        color: $vd-ink-soft;
+    }
+
+    .vd-session-stats dd,
+    .vd-preset__facts dd,
+    .vd-trade-log td,
+    .vd-session__status {
+        color: #fff;
+    }
+
+    .vd-trade-log th,
+    .vd-trade-log td {
+        border-color: $vd-line-soft;
+    }
+
+    .vd-rule-preview {
+        color: $vd-ink-soft;
+
+        &--met {
+            background: rgb(255 145 54 / 18%);
+
+            strong {
+                color: $vd-teal-light;
+            }
+        }
+    }
+
+    .is-up,
+    dd.is-up {
+        color: var(--vd-up) !important;
+    }
+
+    .is-down,
+    dd.is-down {
+        color: var(--vd-down) !important;
+    }
+
+    .vd-session__reset {
+        color: $vd-ink-soft;
+    }
+
+    .vd-real-confirm {
+        color: $vd-ink;
+    }
+
+    .vd-primary-button {
+        background: var(--vd-orange);
+        box-shadow: 0 6px 18px rgb(50 23 7 / 40%);
+    }
+}
+
+// Tool page header (eyebrow + gradient title)
+.vd-tool-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.6rem;
+    margin-bottom: 1.6rem;
+    padding: 2.4rem 2.4rem 2rem;
+    border: 1px solid rgb(255 145 54 / 18%);
+    border-radius: 1.6rem;
+    background: var(--vd-panel);
+    box-shadow: 0 20px 48px rgb(0 0 0 / 35%);
+
+    @include mobile-or-tablet-screen {
+        padding: 1.6rem;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        max-width: 72rem;
+    }
+
+    &__eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: $vd-teal-light;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+
+        span {
+            width: 0.8rem;
+            height: 0.8rem;
+            border-radius: 50%;
+            background: $vd-teal-light;
+            box-shadow: 0 0 10px $vd-teal-light;
+        }
+    }
+
+    &__title {
+        color: var(--vd-orange-text);
+        font-family: var(--vd-font-display);
+        font-size: 3.6rem;
+        font-weight: 900;
+        line-height: 1.1;
+
+        @include mobile-or-tablet-screen {
+            font-size: 2.6rem;
+        }
+    }
+
+    &__subtitle {
+        color: rgb(247 244 242 / 78%);
+        font-size: 1.5rem;
+        line-height: 1.55;
+    }
+
+    &__right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Session stat tiles + big Start / Stop button (both themes)
+// ---------------------------------------------------------------------------
+.vd-stat-tiles {
+    margin: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    > .vd-stat {
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 0.9rem 0.9rem;
+        border: 1px solid rgb(247 244 242 / 14%);
+        border-top: 3px solid var(--vd-stat-color, #94a3b8);
+        border-radius: 0.9rem;
+        background: rgb(0 0 0 / 22%);
+
+        dt,
+        dd {
+            margin: 0;
+        }
+
+        dt {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgb(247 244 242 / 78%);
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        dd {
+            margin-top: 0.5rem;
+            color: #fff;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+    }
+
+    .vd-stat__icon {
+        display: inline-grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: var(--vd-stat-color, #94a3b8);
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .vd-stat--trades {
+        --vd-stat-color: #3b82f6;
+    }
+
+    .vd-stat--won {
+        --vd-stat-color: var(--vd-up);
+
+        dd {
+            color: var(--vd-up);
+        }
+    }
+
+    .vd-stat--lost {
+        --vd-stat-color: var(--vd-down);
+
+        dd {
+            color: var(--vd-down);
+        }
+    }
+
+    .vd-stat--rate {
+        --vd-stat-color: #f59e0b;
+    }
+
+    .vd-stat--pl,
+    .vd-stat--pl-up,
+    .vd-stat--pl-down {
+        --vd-stat-color: var(--vd-orange);
+    }
+
+    .vd-stat--pl-up dd {
+        color: var(--vd-up);
+    }
+
+    .vd-stat--pl-down {
+        --vd-stat-color: var(--vd-down);
+
+        dd {
+            color: var(--vd-down);
+        }
+    }
+
+    .vd-stat--next {
+        --vd-stat-color: var(--vd-orange);
+    }
+}
+
+.vd-page--dark .vd-stat-tiles {
+    > .vd-stat {
+        border: 1px solid rgb(247 244 242 / 14%);
+        border-top: 3px solid var(--vd-stat-color, #94a3b8);
+        background: rgb(0 0 0 / 28%);
+    }
+
+    .vd-stat--won dd {
+        color: var(--vd-up);
+    }
+
+    .vd-stat--lost dd,
+    .vd-stat--pl-down dd {
+        color: var(--vd-down);
+    }
+
+    .vd-stat--pl-up dd {
+        color: var(--vd-up);
+    }
+}
+
+.vd-session__controls {
+    .vd-session__start,
+    .vd-session__stop {
+        flex: 1 1 100%;
+        min-height: 5.6rem;
+        border-radius: 1.2rem;
+        font-size: 1.8rem;
+        letter-spacing: 0.02em;
+        transition:
+            filter 0.15s ease,
+            transform 0.15s ease;
+
+        &:hover:not(:disabled) {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+    }
+
+    .vd-session__start {
+        background: var(--vd-orange);
+        color: var(--vd-on-orange);
+        box-shadow:
+            0 8px 24px rgb(255 145 54 / 40%),
+            0 0 0 1px rgb(255 255 255 / 25%) inset;
+    }
+
+    .vd-session__stop {
+        background: var(--vd-down);
+        box-shadow: 0 8px 24px rgb(240 106 80 / 40%);
+    }
+}
+
+.vd-page--dark {
+    .vd-bulk__quote {
+        color: var(--vd-orange);
+        text-shadow: 0 0 18px rgb(255 145 54 / 45%);
+    }
+
+    .vd-recovery__hero {
+        border: 1px solid rgb(255 145 54 / 18%);
+    }
+}
+
+// Vertically centre dropdown text and paint a chevron. The system arrow
+// disappears on the dark field, so the control no longer looks like a menu.
+select.vd-select,
+.vd-field__input {
+    height: 4rem;
+    min-height: 0;
+    line-height: normal;
+}
+
+select.vd-select {
+    appearance: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 4rem;
+    padding: 0.9rem 3.4rem 0.9rem 1.2rem;
+    font-size: 1.4rem;
+    line-height: 2.2rem;
+    text-align: center;
+    text-align-last: center;
+    color-scheme: dark;
+    cursor: pointer;
+    background-color: var(--vd-field);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23f7f4f2' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center;
+    background-size: 1.1rem 0.7rem;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+// Keep the gold Execute hedge button on the dark page
+.vd-page--dark .vd-primary-button.vd-hedge__execute {
+    background: #fbbf24;
+    color: #1f2937;
+    box-shadow: 0 8px 24px rgb(245 158 11 / 35%);
+}
+
+// ---------------------------------------------------------------------------
+// Bot / strategy cards: accent strip, gradient Load button, hover lift
+// ---------------------------------------------------------------------------
+.vd-preset {
+    position: relative;
+    overflow: hidden;
+    padding-top: 2rem;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto;
+        height: 4px;
+        background: var(--vd-orange);
+    }
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 32px rgb(15 23 42 / 18%);
+    }
+
+    &--gold::before {
+        background: #fbbf24;
+    }
+
+    .vd-preset__open {
+        min-height: 4.8rem;
+        border-radius: 1rem;
+        background: var(--vd-orange);
+        color: var(--vd-on-orange);
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        box-shadow: 0 6px 16px rgb(255 145 54 / 30%);
+    }
+
+    &--gold .vd-preset__open {
+        background: #fbbf24;
+        color: #1f2937;
+        box-shadow: 0 6px 16px rgb(245 158 11 / 35%);
+    }
+}
+
+.vd-page--dark .vd-preset:hover {
+    box-shadow:
+        0 0 0 1px rgb(255 145 54 / 45%),
+        0 18px 40px rgb(0 0 0 / 45%);
+}
+
+// ===========================================================================
+// Vindolar workspace — one dark theme for the home screen and every tool.
+// Dark brown and orange from the palette in src/styles/index.scss, flat colours only
+// (no gradients) so the workspace stays calm and readable.
+// ===========================================================================
+$vd-night: var(--vd-bg);
+$vd-night-raise: var(--vd-panel);
+$vd-violet: var(--vd-orange);
+$vd-violet-deep: var(--vd-orange);
+$vd-ink: var(--vd-text);
+$vd-ink-soft: var(--vd-muted);
+
+.vd-ticker {
+    overflow: hidden;
+    flex: 0 0 auto;
+    height: 2.8rem;
+    margin-bottom: 0;
+    border: none;
+    border-bottom: 1px solid rgb(255 255 255 / 8%);
+    border-radius: 0;
+    background: var(--vd-ticker-bg);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+
+    &__track {
+        display: flex;
+        width: max-content;
+        animation: vd-ticker-scroll 48s linear infinite;
+    }
+
+    &__set {
+        display: flex;
+    }
+
+    &__item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0 1.8rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 2.8rem;
+        white-space: nowrap;
+    }
+
+    &__name {
+        color: $vd-ink-soft;
+        font-weight: 600;
+    }
+
+    &__price {
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__item.is-up &__price {
+        color: var(--vd-up);
+    }
+
+    &__item.is-down &__price {
+        color: var(--vd-down);
+    }
+}
+
+@keyframes vd-ticker-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-ticker__track {
+        animation: none;
+    }
+}
+
+.vd-home {
+    background: var(--vd-bg) !important;
+    color: $vd-ink;
+}
+
+.vd-page--dark,
+.vd-skin {
+    // Deriv's theme colours, remapped so any panel that uses them (trade panel, positions,
+    // tables, dialogs inside tool pages) turns brown instead of white.
+    --general-main-1: var(--vd-panel);
+    --general-section-1: var(--vd-field);
+    --general-hover: var(--vd-panel-hover);
+    --text-prominent: var(--vd-text);
+    --text-general: var(--vd-muted);
+    --text-less-prominent: var(--vd-faint);
+    --border-normal: var(--vd-border);
+
+    background: var(--vd-bg) !important;
+    color: $vd-ink;
+
+    .vd-tool-hero {
+        border-color: var(--vd-border);
+        border-radius: 1rem;
+        background: var(--vd-panel);
+        box-shadow: none;
+    }
+
+    .vd-tool-hero__eyebrow {
+        color: var(--vd-orange);
+
+        span {
+            background: var(--vd-orange);
+            box-shadow: none;
+        }
+    }
+
+    .vd-tool-hero__title {
+        color: var(--vd-orange-text);
+        font-family: var(--vd-font-display);
+        letter-spacing: -0.04em;
+    }
+
+    .vd-tool-hero__subtitle,
+    .vd-card__text,
+    .vd-page__header p,
+    .vd-number__hint,
+    .vd-field__label,
+    .vd-analysis__note,
+    .vd-analysis__loading,
+    .vd-manual__risk,
+    .vd-market-card__footer,
+    .vd-market-card__price {
+        color: $vd-ink-soft;
+    }
+
+    .vd-card,
+    .vd-market-card,
+    .vd-manual__chart-card,
+    .vd-panel,
+    .vd-detail {
+        border: 1px solid var(--vd-border);
+        border-radius: 1rem;
+        background: var(--vd-panel);
+        box-shadow: none;
+    }
+
+    .vd-card__title,
+    .vd-market-card__name,
+    h2,
+    h3,
+    .vd-manual__quote strong {
+        color: #fff;
+    }
+
+    .vd-primary-button,
+    .vd-session__start,
+    .vd-preset__open,
+    .vd-market-card__open {
+        border: none;
+        border-radius: 1rem;
+        background: var(--vd-orange);
+        color: var(--vd-on-orange);
+        box-shadow: none;
+
+        &:hover:not(:disabled) {
+            background: var(--vd-orange-hover);
+        }
+    }
+
+    .vd-chip-select button.is-active,
+    .vd-digit-picker button.is-active,
+    .vd-segmented button.is-active {
+        border-color: transparent;
+        background: var(--vd-orange);
+        color: var(--vd-on-orange);
+        box-shadow: none;
+    }
+
+    .vd-number__box,
+    .vd-field__input {
+        border-color: var(--vd-border-soft);
+        background: var(--vd-field);
+        color: #fff;
+        border-radius: 0.8rem;
+
+        input,
+        option {
+            color: #fff;
+            background: var(--vd-panel);
+        }
+    }
+
+    select.vd-select {
+        border-color: var(--vd-border-soft);
+        border-radius: 0.8rem;
+        color: #fff;
+        background-color: var(--vd-field);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23f7f4f2' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1.2rem center;
+        background-size: 1.1rem 0.7rem;
+
+        option {
+            color: #fff;
+            background: var(--vd-panel);
+        }
+    }
+
+    .vd-page__note,
+    .vd-analysis__note {
+        border: none;
+        border-radius: 1.2rem;
+        background: rgb(251 191 36 / 10%);
+        color: $vd-ink-soft;
+    }
+
+    .vd-digit__disc {
+        fill: rgb(255 255 255 / 6%);
+    }
+
+    .vd-digit__label strong,
+    .vd-split,
+    .vd-last-digits {
+        color: $vd-ink;
+    }
+}
+
+.vd-skin {
+    position: relative;
+    isolation: isolate;
+
+    > *:not(.vd-backdrop) {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+.vd-analysis.vd-skin,
+.vd-manual.vd-skin {
+    .vd-analysis__title h2,
+    .vd-field__label,
+    .vd-manual__quote span b {
+        color: #fff;
+    }
+
+    .vd-live {
+        background: rgb(255 145 54 / 18%);
+        color: #ffd7ad;
+    }
+
+    .vd-chart__line {
+        stroke: var(--vd-orange);
+    }
+
+    .vd-chart__grid line {
+        stroke: rgb(255 255 255 / 8%);
+    }
+
+    .vd-chart__grid text {
+        fill: rgb(247 244 242 / 55%);
+    }
+}
+
+// ===========================================================================
+// UX audit fixes (contrast, tap targets, labels) — measured with WCAG ratios
+// ===========================================================================
+
+// Muted text that stays readable: 6.1:1 on white, light on dark surfaces
+:root {
+    --vd-text-muted: #5b6472;
+}
+
+.theme--dark,
+.vd-page--dark,
+.vd-recovery__hero,
+.vd-tool-hero {
+    --vd-text-muted: rgb(247 244 242 / 72%);
+}
+
+// Loss red that passes 4.5:1 on white (was var(--vd-down) = 3.76:1)
+.is-down,
+.vd-money--down,
+.vd-buy__error,
+.vd-global__chip .is-down {
+    color: var(--vd-down);
+}
+
+.vd-page--dark .vd-money--down {
+    color: var(--vd-down);
+}
+
+// Welcome panel on the dark dashboard (desktop side panel): dark text on dark was 1.47:1.
+// On phones it opens in a white pop-up, so the template's dark text is kept there.
+@include desktop-screen {
+    .db-info-panel {
+        color: rgb(247 244 242 / 82%);
+
+        .dc-text {
+            color: rgb(247 244 242 / 82%) !important;
+        }
+
+        h1.dc-text {
+            color: #fff !important;
+        }
+    }
+}
+
+.db-info-panel .db-info-panel__close-action,
+.db-info-panel__close-action {
+    display: grid;
+    place-items: center;
+    width: 3.6rem;
+    height: 3.6rem;
+    border: none;
+    border-radius: 50%;
+    background: rgb(127 127 127 / 14%);
+    color: var(--text-prominent);
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 2px solid var(--vd-orange);
+        outline-offset: 2px;
+    }
+}
+
+@include desktop-screen {
+    .db-info-panel .db-info-panel__close-action {
+        color: #fff;
+    }
+}
+
+// Manual Trader stake/take-profit inputs fill their stepper box
+.vd-stepper input {
+    align-self: stretch;
+    height: 100%;
+}
+
+// Footer text and icons on the dark footer (clock was 1.53:1)
+.app-footer {
+    color: rgb(247 244 242 / 75%);
+
+    .derivs-text__size--xs,
+    .deriv-text,
+    span {
+        color: rgb(247 244 242 / 75%);
+    }
+
+    .app-footer__icon {
+        min-width: 3.2rem;
+        min-height: 3.2rem;
+
+        svg,
+        svg path {
+            fill: rgb(247 244 242 / 80%);
+        }
+    }
+}
+
+// Run button stays full strength even while disabled, so the label is readable.
+body .main__run-strategy-wrapper #db-animation__run-button.dc-btn,
+body .main__run-strategy-wrapper #db-animation__stop-button.dc-btn,
+body .run-panel #db-animation__run-button.dc-btn,
+body .run-panel #db-animation__stop-button.dc-btn {
+    border-radius: 0.6rem;
+    background-color: var(--vd-orange) !important;
+    color: #fff !important;
+    opacity: 1 !important;
+
+    &:disabled,
+    &[disabled] {
+        opacity: 1 !important;
+        cursor: not-allowed;
+    }
+
+    .dc-btn__text,
+    .dc-btn__icon {
+        color: #fff !important;
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+    svg,
+    svg path {
+        fill: #fff !important;
+    }
+}
+
+.deriv-header .deriv-wrapper__left {
+    align-items: center;
+}
+
+// Phone menu button: was an unlabelled 16px-wide icon
+.vd-menu-toggle {
+    display: grid;
+    place-items: center;
+    width: 4.4rem;
+    height: 4.4rem;
+    border: none;
+    border-radius: 0.8rem;
+    background: transparent;
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: 2px solid var(--vd-orange);
+    }
+}
+
+// Whole field box is clickable: the input fills it (was a 16px strip)
+.vd-number__box input {
+    align-self: stretch;
+    height: 100%;
+}
+
+// Small text buttons ("Check again", "Refresh", "Details", pager…) → real targets
+.vd-session__reset {
+    min-height: 3.2rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.6rem;
+
+    &:hover:not(:disabled) {
+        background: rgb(127 127 127 / 12%);
+        color: var(--text-prominent);
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
+.vd-market-card__open {
+    min-height: 3.2rem;
+    padding: 0.6rem 1.2rem !important;
+}
+
+// Market Scanner pills and flags on the dark page (white on light grey was 1.11:1)
+.vd-page--dark {
+    .vd-scanner__pill {
+        background: rgb(255 255 255 / 8%);
+        color: #fff;
+    }
+
+    .vd-scanner__flag {
+        background: rgb(240 106 80 / 14%);
+        color: #fca5a5;
+
+        &.is-on {
+            background: rgb(45 212 191 / 18%);
+            color: var(--vd-orange);
+        }
+    }
+
+    .vd-scanner__live {
+        color: var(--vd-orange);
+    }
+
+    tr.is-ready td {
+        background: rgb(45 212 191 / 10%);
+    }
+
+    // Positions list (Hedging) on the dark page instead of a bright white card
+    .vd-positions,
+    .vd-position {
+        border-color: rgb(255 255 255 / 12%);
+        background: rgb(255 255 255 / 4%);
+        color: #fff;
+    }
+
+    .vd-positions__summary div {
+        background: rgb(255 255 255 / 6%);
+    }
+
+    .vd-positions__summary dd,
+    .vd-position__main strong {
+        color: #fff;
+    }
+}
+
+// Phones: 40px+ tap targets for chips, tabs, segmented controls and text buttons;
+// floating buttons shrink to icons so they cover less of the page.
+@include mobile-or-tablet-screen {
+    .vd-chip-select button,
+    .vd-segmented button,
+    .vd-trade-panel__types button,
+    .vd-tools__filters button,
+    .vd-session__reset,
+    .vd-market-card__open {
+        min-height: 4rem;
+    }
+
+    .vd-digit-picker button {
+        height: 4rem;
+    }
+
+    .vd-global__label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+
+    .vd-global__risk {
+        width: 4rem;
+        height: 4rem;
+        padding: 0;
+        font-size: 1.6rem;
+    }
+
+    .vd-global__chip {
+        height: 4rem;
+    }
+
+    .vd-scanner-fab .vd-scanner-fab__label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .vd-scanner-fab {
+        width: 5.2rem;
+        height: 5.2rem;
+        padding: 0;
+        justify-content: center;
+        overflow: hidden;
+        background: #120818;
+
+        .vd-scanner-fab__icon {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+.vd-global__count {
+    display: none;
+}
+
+@include mobile-or-tablet-screen {
+    .vd-global__count {
+        display: inline;
+        font-weight: 800;
+    }
+}
+
+@include mobile-or-tablet-screen {
+    .announcements__button {
+        min-width: 4rem;
+        min-height: 4rem;
+    }
+}
+
+.vd-global__risk {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+// ===========================================================================
+// Workspace frame (header, tab strip, ticker, run bar, scanner button),
+// matched to the reference dashboard. Flat colours only.
+// ===========================================================================
+.app-header {
+    background: var(--vd-bar);
+    border-bottom-color: rgb(255 255 255 / 6%);
+}
+
+.layout .deriv-header,
+.app-footer {
+    border-color: rgb(255 255 255 / 6%);
+}
+
+// Edge fades of the tab strip are not needed (arrows + scrollbar show there is more).
+.main .tabs-shadow {
+    display: none;
+}
+
+// Run + bot status pill at the bottom centre
+.main__run-strategy-wrapper {
+    @include desktop-screen {
+        border: 1px solid rgb(247 244 242 / 40%);
+        background: #1a120c !important;
+        box-shadow: none !important;
+    }
+
+    .animation__container {
+        background-color: #1a120c !important;
+        border-color: rgb(247 244 242 / 28%);
+        color: #fff;
+    }
+
+    .animation__text,
+    .animation__text * {
+        color: #fff !important;
+        font-size: 1.6rem;
+        font-weight: 800;
+        line-height: 1.8rem;
+    }
+
+    .animation__progress-line {
+        background-color: rgb(247 244 242 / 55%);
+    }
+
+    .animation__progress .static-circle {
+        width: 6px;
+        height: 6px;
+        background-color: #fff;
+    }
+
+    .qs__tooltip svg,
+    .qs__tooltip svg path {
+        fill: #fff;
+    }
+}
+
+// Price ticker under the tab strip: "VOL 10  4847.777 ▼" cells with dividers
+.vd-ticker--strip {
+    height: 3rem;
+    border-bottom: 1px solid rgb(255 255 255 / 6%);
+    background: var(--vd-ticker-bg);
+    mask-image: none;
+
+    .vd-ticker__item {
+        gap: 0.6rem;
+        padding: 0 1.8rem;
+        border-inline-end: 1px solid rgb(255 255 255 / 7%);
+        font-size: 1.15rem;
+        line-height: 3rem;
+        letter-spacing: 0.04em;
+    }
+
+    .vd-ticker__name {
+        color: rgb(247 244 242 / 55%);
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .vd-ticker__item.is-up .vd-ticker__price {
+        color: var(--vd-tick-up);
+    }
+
+    .vd-ticker__item.is-down .vd-ticker__price {
+        color: var(--vd-tick-down);
+    }
+}
+
+// Floating scanner button: "AI Scanner / Click to analyze" card with a round badge
+// (desktop; phones keep the round icon-only badge defined above).
+.vd-scanner-fab {
+    @include desktop-screen {
+        height: auto;
+        padding: 0.8rem 1.6rem 0.8rem 0.8rem;
+        border: 1px solid var(--vd-border);
+        border-radius: 1.2rem;
+        background: var(--vd-panel);
+        box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+        text-align: start;
+    }
+
+    // Keeps the scanner image and sweep inside the round badge; adds an orange ring.
+    &__icon {
+        border: 2px solid var(--vd-orange);
+
+        @include desktop-screen {
+            width: 4.4rem;
+            height: 4.4rem;
+        }
+    }
+
+    &__label {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+
+        strong {
+            color: #fff;
+            font-size: 1.4rem;
+        }
+
+        small {
+            color: var(--vd-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+    }
+
+    &.is-open {
+        border-color: var(--vd-orange);
+        box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+    }
+}
+
+.vd-scanner-panel {
+    border-color: var(--vd-border);
+    background: var(--vd-panel);
+    color: #fff;
+    --text-prominent: #fff;
+    --text-general: #f7f4f2;
+    --vd-text-muted: #f7f4f2;
+
+    .vd-field__label,
+    .vd-card__text {
+        color: #f7f4f2;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .vd-scanner-panel__row-main strong {
+        color: #fff;
+        font-size: 1.5rem;
+    }
+
+    // Green = even, digits 5–9, or a digit hotter than its fair share.
+    // Red = odd, digits 0–4, or a digit colder than its fair share.
+    .vd-scanner-panel__finding,
+    .vd-scanner-panel__streak {
+        font-size: 1.4rem;
+        font-weight: 700;
+
+        &.is-up {
+            color: var(--vd-up);
+        }
+
+        &.is-down {
+            color: var(--vd-down);
+        }
+    }
+
+    .vd-scanner-panel__digits {
+        display: inline-flex;
+        gap: 0.45rem;
+        margin-inline-start: 0.3rem;
+
+        b {
+            font-weight: 800;
+
+            &.is-even {
+                color: var(--vd-up);
+            }
+
+            &.is-odd {
+                color: var(--vd-down);
+            }
+        }
+    }
+
+    .vd-scanner-panel__score {
+        color: var(--vd-up);
+        background: rgb(32 197 140 / 16%);
+
+        &.is-high {
+            color: #fff;
+            background: var(--vd-down);
+        }
+    }
+
+    .vd-scanner-panel__actions .vd-session__reset {
+        font-size: 1.5rem;
+        font-weight: 800;
+
+        &:first-child {
+            color: var(--vd-up);
+        }
+
+        &:last-child {
+            color: var(--vd-orange-text);
+        }
+    }
+
+    .vd-segmented {
+        background: var(--vd-field);
+        box-shadow: inset 0 0 0 1px var(--vd-border);
+
+        button {
+            color: #f7f4f2;
+
+            &.is-active {
+                background: var(--vd-orange);
+                color: #fff;
+            }
+        }
+    }
+}
+
+// PAYOUT sits on the orange cards; the dark-page label color is too dim there.
+.vd-page--dark .vd-hedge-leg .vd-field__label {
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+

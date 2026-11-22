@@ -1,0 +1,641 @@
+@use 'components/shared/styles/mixins' as *;
+
+$vd-navy: var(--vd-orange);
+$vd-navy-dark: var(--vd-border-strong);
+$vd-teal: var(--vd-orange);
+$vd-teal-dark: var(--vd-orange-text);
+$vd-red: var(--vd-down);
+$vd-amber: var(--vd-warn);
+
+.vd-analysis {
+    width: 100%;
+    height: calc(100vh - 17rem);
+    overflow-y: auto;
+    padding: 1.6rem 2rem 3.2rem;
+    background: var(--general-section-1);
+    border-radius: 0 0 1.2rem 1.2rem;
+
+    @include mobile-or-tablet-screen {
+        height: auto;
+        min-height: calc(100vh - 12rem);
+        padding: 1.2rem 1.2rem 8rem;
+        border-radius: 0;
+    }
+
+    &__toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.2rem 2rem;
+        margin-bottom: 1.2rem;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-inline-end: auto;
+
+        h2 {
+            color: var(--text-prominent);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    }
+
+    &__settings {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+    }
+
+    &__note {
+        margin-bottom: 1.6rem;
+        padding: 1rem 1.4rem;
+        border-inline-start: 4px solid $vd-amber;
+        border-radius: 0.6rem;
+        background: rgb(245 158 11 / 10%);
+        color: var(--text-general);
+        font-size: 1.3rem;
+        line-height: 1.5;
+    }
+
+    &__error {
+        color: $vd-red;
+        font-size: 1.4rem;
+    }
+
+    &__loading {
+        color: var(--vd-text-muted);
+        font-size: 1.4rem;
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+        gap: 1.6rem;
+
+        @include mobile-screen {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+.vd-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.3rem 1rem;
+    border-radius: 10rem;
+    background: rgb(255 145 54 / 15%);
+    color: $vd-teal-dark;
+    font-size: 1.2rem;
+    font-weight: 700;
+
+    &::before {
+        content: '';
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 50%;
+        background: $vd-teal;
+        animation: vd-pulse 1.6s ease-in-out infinite;
+    }
+
+    &--off {
+        background: rgb(245 158 11 / 15%);
+        color: #b45309;
+
+        &::before {
+            background: $vd-amber;
+        }
+    }
+}
+
+@keyframes vd-pulse {
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-live::before {
+        animation: none;
+    }
+}
+
+.vd-segmented {
+    display: inline-flex;
+    padding: 0.3rem;
+    border-radius: 0.8rem;
+    background: var(--general-main-1);
+    box-shadow: inset 0 0 0 1px var(--border-normal);
+
+    button {
+        padding: 0.7rem 1.4rem;
+        border: none;
+        border-radius: 0.6rem;
+        background: transparent;
+        color: var(--text-general);
+        font-size: 1.3rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &.is-active {
+            background: $vd-navy;
+            color: #fff;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $vd-teal;
+            outline-offset: 1px;
+        }
+    }
+}
+
+.vd-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    &--inline {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    &__label {
+        color: var(--vd-text-muted);
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    &__input {
+        min-height: 3.6rem;
+        padding: 0 1rem;
+        border: 1px solid var(--border-normal);
+        border-radius: 0.6rem;
+        background: var(--general-main-1);
+        color: var(--text-prominent);
+        font-size: 1.4rem;
+
+        &:focus-visible {
+            outline: 2px solid $vd-teal;
+            outline-offset: 1px;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Market card
+// ---------------------------------------------------------------------------
+.vd-market-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 1.4rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 1.2rem;
+    background: var(--general-main-1);
+    min-width: 0;
+
+    &[aria-busy='true'] {
+        opacity: 0.7;
+    }
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    &__name {
+        color: var(--text-prominent);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    &__price {
+        color: var(--text-general);
+        font-family: var(--brand-font-monospace);
+        font-size: 1.3rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__open {
+        flex-shrink: 0;
+        padding: 0.4rem 1rem;
+        border: 1px solid rgb(50 23 7 / 30%);
+        border-radius: 10rem;
+        background: rgb(50 23 7 / 6%);
+        color: var(--text-prominent);
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+            background: rgb(50 23 7 / 12%);
+        }
+    }
+
+    &__bars {
+        display: grid;
+        gap: 0.6rem;
+    }
+
+    &__footer {
+        color: var(--vd-text-muted);
+        font-size: 1.1rem;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Digit circles (ranked colours: most = green, 2nd = blue, 2nd least = orange, least = red)
+// ---------------------------------------------------------------------------
+$vd-rank-top: var(--vd-up);
+$vd-rank-second: #2563eb;
+$vd-rank-second-low: #f59e0b;
+$vd-rank-low: var(--vd-down);
+
+.vd-digits {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.2rem 0.4rem;
+    justify-items: center;
+}
+
+.vd-digit {
+    position: relative;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+
+    svg {
+        grid-area: 1 / 1;
+        overflow: visible;
+    }
+
+    &__disc {
+        fill: var(--general-main-1);
+        transition: fill 0.3s ease;
+    }
+
+    &__track {
+        fill: none;
+        stroke: var(--general-section-1);
+    }
+
+    &__fill {
+        fill: none;
+        stroke: #94a3b8;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.4s ease;
+    }
+
+    &__label {
+        grid-area: 1 / 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.05;
+
+        strong {
+            color: var(--text-prominent);
+            font-weight: 800;
+        }
+
+        small {
+            color: var(--vd-text-muted);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    // Ranked digits: solid filled disc, white text, glowing ring
+    @mixin rank($color) {
+        .vd-digit__disc {
+            fill: $color;
+        }
+
+        .vd-digit__fill {
+            stroke: $color;
+            filter: drop-shadow(0 0 4px rgba($color, 0.55));
+        }
+
+        .vd-digit__track {
+            stroke: rgba($color, 0.25);
+        }
+
+        .vd-digit__label strong,
+        .vd-digit__label small {
+            color: #fff;
+        }
+    }
+
+    &--top {
+        @include rank($vd-rank-top);
+    }
+
+    &--second {
+        @include rank($vd-rank-second);
+    }
+
+    &--second-low {
+        @include rank($vd-rank-second-low);
+    }
+
+    &--low {
+        @include rank($vd-rank-low);
+    }
+
+    &--current {
+        transform: scale(1.06);
+    }
+
+    &__pointer {
+        position: absolute;
+        bottom: -0.9rem;
+        width: 0;
+        height: 0;
+        border-inline: 0.6rem solid transparent;
+        border-bottom: 0.7rem solid var(--vd-down);
+        filter: drop-shadow(0 1px 1px rgb(0 0 0 / 25%));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Split bars (green left / red right, labels inside)
+// ---------------------------------------------------------------------------
+.vd-split {
+    display: flex;
+    overflow: hidden;
+    height: 2.8rem;
+    border-radius: 0.8rem;
+    background: var(--vd-orange);
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%);
+
+    &__left,
+    &__right {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        padding: 0 1rem;
+        white-space: nowrap;
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 1px rgb(0 0 0 / 25%);
+        }
+    }
+
+    &__left {
+        background: var(--vd-up);
+        transition: width 0.4s ease;
+    }
+
+    &__right {
+        flex: 1;
+        justify-content: flex-end;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Last digit chips (green = even, red = odd, latest outlined)
+// ---------------------------------------------------------------------------
+.vd-last-digits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+
+    &__chip {
+        display: inline-grid;
+        place-items: center;
+        width: 2.6rem;
+        height: 2.6rem;
+        border: 2px solid transparent;
+        border-radius: 0.6rem;
+        font-size: 1.3rem;
+        font-weight: 800;
+
+        &--even {
+            border-color: var(--vd-up);
+            background: rgb(34 197 94 / 12%);
+            color: #15803d;
+        }
+
+        &--odd {
+            border-color: var(--vd-down);
+            background: rgb(240 106 80 / 10%);
+            color: var(--vd-down);
+        }
+
+        &--latest {
+            color: #fff;
+            box-shadow:
+                0 0 0 2px var(--general-main-1),
+                0 0 0 4px #f59e0b;
+
+            &.vd-last-digits__chip--even {
+                background: var(--vd-up);
+            }
+
+            &.vd-last-digits__chip--odd {
+                background: var(--vd-down);
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Single market view
+// ---------------------------------------------------------------------------
+.vd-detail {
+    display: grid;
+    gap: 1.6rem;
+
+    &__top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.6rem;
+        padding: 1.6rem;
+        border-radius: 1.2rem;
+        background: $vd-navy-dark;
+        color: #fff;
+
+        .vd-field__label {
+            color: rgb(255 255 255 / 70%);
+        }
+
+        .vd-field__input {
+            min-width: 26rem;
+            border-color: rgb(255 255 255 / 25%);
+            background: rgb(255 255 255 / 8%);
+            color: #fff;
+
+            option {
+                color: #0f172a;
+            }
+
+            @include mobile-screen {
+                min-width: 0;
+                width: 100%;
+            }
+        }
+    }
+
+    &__price {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.2rem;
+    }
+
+    &__quote {
+        font-family: var(--brand-font-monospace);
+        font-size: 3.2rem;
+        font-variant-numeric: tabular-nums;
+
+        &--up {
+            color: var(--vd-orange);
+        }
+
+        &--down {
+            color: #fca5a5;
+        }
+    }
+
+    &__latest-digit {
+        font-size: 1.3rem;
+
+        b {
+            color: var(--vd-orange);
+            font-size: 1.6rem;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.6rem;
+
+        @include mobile-or-tablet-screen {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .vd-digits {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+
+        @include mobile-screen {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+}
+
+.vd-panel {
+    padding: 1.6rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 1.2rem;
+    background: var(--general-main-1);
+
+    &__title {
+        display: flex;
+        align-items: baseline;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+        color: var(--text-prominent);
+        font-size: 1.5rem;
+        font-weight: 700;
+
+        small {
+            color: var(--vd-text-muted);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+    }
+}
+
+.vd-histogram {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0.6rem;
+    height: 14rem;
+    margin-top: 2rem;
+
+    &__col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.4rem;
+        min-height: 0;
+
+        span {
+            color: var(--vd-text-muted);
+            font-size: 1.2rem;
+        }
+    }
+
+    &__bar {
+        width: 100%;
+        max-width: 3.6rem;
+        min-height: 2px;
+        border-radius: 0.4rem 0.4rem 0 0;
+        background: #94a3b8;
+        transition: height 0.3s ease;
+
+        &--most {
+            background: var(--vd-up);
+        }
+
+        &--least {
+            background: var(--vd-down);
+        }
+    }
+}
+
+.vd-streaks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+
+    div {
+        padding: 1.2rem;
+        border-radius: 0.8rem;
+        background: var(--general-section-1);
+        text-align: center;
+    }
+
+    dt {
+        color: var(--vd-text-muted);
+        font-size: 1.2rem;
+    }
+
+    dd {
+        color: var(--text-prominent);
+        font-size: 2.4rem;
+        font-weight: 800;
+    }
+}
+
+// In market cards the last 10 digits always fit on one row
+.vd-market-card .vd-last-digits {
+    flex-wrap: nowrap;
+
+    .vd-last-digits__chip {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        height: 2.6rem;
+    }
+}

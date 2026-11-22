@@ -10,7 +10,7 @@ import MobileWrapper from '@/components/shared_ui/mobile-wrapper';
 import Tabs from '@/components/shared_ui/tabs/tabs';
 import TradeTypeConfirmationModal from '@/components/trade-type-confirmation-modal';
 import TradingViewModal from '@/components/trading-view-chart/trading-view-modal';
-import { DBOT_TABS, TAB_IDS } from '@/constants/bot-contents';
+import { DBOT_TABS, LAST_TAB_ID, NAV_TABS, TAB_HASHES, TAB_IDS, TNavTabKey } from '@/constants/bot-contents';
 import { api_base, updateWorkspaceName } from '@/external/bot-skeleton';
 import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
 import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
@@ -30,9 +30,24 @@ import {
     setModalStateChangeCallback,
 } from '@/utils/trade-type-modal-handler';
 import {
+    LabelPairedArrowsRotateCaptionRegularIcon,
+    LabelPairedBellCaptionRegularIcon,
+    LabelPairedChartAreaCaptionRegularIcon,
     LabelPairedChartLineCaptionRegularIcon,
-    LabelPairedObjectsColumnCaptionRegularIcon,
-    LabelPairedPuzzlePieceTwoCaptionBoldIcon,
+    LabelPairedChartMixedCaptionRegularIcon,
+    LabelPairedChartTrendUpCaptionRegularIcon,
+    LabelPairedCloneCaptionRegularIcon,
+    LabelPairedFileChartColumnCaptionRegularIcon,
+    LabelPairedGaugeMaxCaptionRegularIcon,
+    LabelPairedGearCaptionRegularIcon,
+    LabelPairedGridCaptionRegularIcon,
+    LabelPairedHandGestureTapRightCaptionRegularIcon,
+    LabelPairedHandsHoldingDiamondCaptionRegularIcon,
+    LabelPairedMagnifyingGlassPlusCaptionRegularIcon,
+    LabelPairedPuzzlePieceTwoCaptionRegularIcon,
+    LabelPairedShieldCheckCaptionRegularIcon,
+    LabelPairedSlidersCaptionRegularIcon,
+    LabelPairedUsersCaptionRegularIcon,
 } from '@deriv/quill-icons/LabelPaired';
 import { LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
 import { Localize, localize } from '@deriv-com/translations';
@@ -41,10 +56,36 @@ import RunPanel from '../../components/run-panel';
 import ChartModal from '../chart/chart-modal';
 import Dashboard from '../dashboard';
 import RunStrategy from '../dashboard/run-strategy';
+import FloatingScanner from '@/components/vindolar/floating-scanner';
+import GlobalStatus from './global-status';
+import TickerUnderTabs from './ticker-under-tabs';
 import './main.scss';
 
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
+// Vindolar tools (loaded only when their tab is opened)
+const RecoveryTrader = lazy(() => import('../recovery-trader'));
+const FreeBots = lazy(() => import('../free-bots'));
+const BulkTrader = lazy(() => import('../bulk-trader'));
+const AnalysisTools = lazy(() => import('../analysis-tools'));
+const HedgingTool = lazy(() => import('../hedging-tool'));
+const AutoStrategies = lazy(() => import('../auto-strategies'));
+const ManualTrader = lazy(() => import('../manual-trader'));
+const PatternBots = lazy(() => import('../pattern-bots'));
+const MarketScanner = lazy(() => import('../market-scanner'));
+const QuickBot = lazy(() => import('../quick-bot'));
+const Signals = lazy(() => import('../signals'));
+const CopyTrader = lazy(() => import('../copy-trader'));
+const SpeedTrader = lazy(() => import('../speed-trader'));
+const Automated = lazy(() => import('../automated'));
+const StrategyTester = lazy(() => import('../strategy-tester'));
+const Reports = lazy(() => import('../reports'));
+
+const NAV_ICON_PROPS = { height: '16px', width: '16px', fill: 'currentColor' };
+
+const withLoader = (page: React.ReactNode) => (
+    <Suspense fallback={<ChunkLoader message={localize('Please wait, loading...')} />}>{page}</Suspense>
+);
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -77,7 +118,8 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial'];
+    // Url hash per tab, in tab order (see NAV_TABS in constants/bot-contents.ts)
+    const hash = TAB_HASHES;
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -122,7 +164,9 @@ const AppWrapper = observer(() => {
     const GetHashedValue = (tab: number) => {
         tab_value = location.hash?.split('#')[1];
         if (!tab_value) return tab;
-        return Number(hash.indexOf(String(tab_value)));
+        const index = hash.indexOf(String(tab_value));
+        // Unknown hash (e.g. an old bookmark): stay on the current tab instead of an invalid index.
+        return index >= 0 ? index : tab;
     };
     const active_hash_tab = GetHashedValue(active_tab);
 
@@ -138,9 +182,32 @@ const AppWrapper = observer(() => {
         resetUrlParamProcessing();
     }, [location.search]);
 
+    // Keep the active tab visible in the (horizontally scrolling) tab strip.
+    React.useEffect(() => {
+        const frame = requestAnimationFrame(() => {
+            const strip = document.querySelector<HTMLElement>('.dc-tabs__list--main__tabs');
+            const tab = strip?.querySelectorAll<HTMLElement>('.dc-tabs__item--main__tabs')[active_tab];
+            if (!strip || !tab) return;
+            const strip_rect = strip.getBoundingClientRect();
+            const tab_rect = tab.getBoundingClientRect();
+            const left = strip.scrollLeft + tab_rect.left - strip_rect.left - strip_rect.width / 2 + tab_rect.width / 2;
+            strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+        });
+        return () => cancelAnimationFrame(frame);
+    }, [active_tab]);
+
+    // Follow the url hash (links, browser back/forward, typed urls): open the tab it names.
+    React.useEffect(() => {
+        if (init_render.current) return;
+        const index = TAB_HASHES.indexOf(location.hash.replace('#', ''));
+        if (index >= 0 && index !== active_tab) setActiveTab(index);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.hash]);
+
     React.useEffect(() => {
         const el_dashboard = document.getElementById('id-dbot-dashboard');
-        const el_tutorial = document.getElementById('id-tutorials');
+        // Right-hand scroll shadow tracks whichever tab is last in the bar.
+        const el_tutorial = document.getElementById(LAST_TAB_ID);
 
         const observer_dashboard = new window.IntersectionObserver(
             ([entry]) => {
@@ -362,6 +429,96 @@ const AppWrapper = observer(() => {
         }
     };
     // [/AI]
+
+    // The Run button / run panel belong to the Bot Builder bot. Show them only on tabs where that bot is
+    // relevant, so users don't think "Run" starts the tool on screen. While a bot runs, keep them everywhere.
+    const BOT_CONTEXT_TABS = [
+        DBOT_TABS.DASHBOARD,
+        DBOT_TABS.BOT_BUILDER,
+        DBOT_TABS.CHART,
+        DBOT_TABS.FREE_BOTS,
+        DBOT_TABS.QUICK_BOT,
+        DBOT_TABS.TUTORIAL,
+    ];
+    const show_bot_controls = BOT_CONTEXT_TABS.includes(active_tab) || run_panel.is_running || Boolean(active_tour);
+
+    // Icon and content for every tab in NAV_TABS (order and labels live in constants/bot-contents.ts).
+    const tab_pages: Record<TNavTabKey, { icon: React.ReactNode; content?: React.ReactNode; id?: string }> = {
+        DASHBOARD: {
+            icon: <LabelPairedGridCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: <Dashboard handleTabChange={handleTabChange} />,
+        },
+        // The Blockly workspace is rendered outside the tabs and shown when this tab is active.
+        BOT_BUILDER: { icon: <LabelPairedPuzzlePieceTwoCaptionRegularIcon {...NAV_ICON_PROPS} /> },
+        RECOVERY_TRADER: {
+            icon: <LabelPairedArrowsRotateCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<RecoveryTrader />),
+        },
+        FREE_BOTS: { icon: <LabelPairedGridCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<FreeBots />) },
+        BULK_TRADER: { icon: <LabelPairedCloneCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<BulkTrader />) },
+        ANALYSIS_TOOLS: {
+            icon: <LabelPairedChartMixedCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<AnalysisTools />),
+        },
+        STRATEGY_TESTER: {
+            icon: <LabelPairedChartAreaCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<StrategyTester />),
+        },
+        REPORTS: {
+            icon: <LabelPairedFileChartColumnCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<Reports />),
+        },
+        HEDGING_TOOL: {
+            icon: <LabelPairedShieldCheckCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<HedgingTool />),
+        },
+        AUTO_STRATEGIES: {
+            icon: <LabelPairedChartTrendUpCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<AutoStrategies />),
+        },
+        MANUAL_TRADER: {
+            icon: <LabelPairedHandGestureTapRightCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<ManualTrader />),
+        },
+        PATTERN_BOTS: {
+            icon: <LabelPairedHandsHoldingDiamondCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<PatternBots />),
+        },
+        MARKET_SCANNER: {
+            icon: <LabelPairedMagnifyingGlassPlusCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<MarketScanner />),
+        },
+        QUICK_BOT: { icon: <LabelPairedSlidersCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<QuickBot />) },
+        SIGNALS: { icon: <LabelPairedBellCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<Signals />) },
+        COPY_TRADER: { icon: <LabelPairedUsersCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<CopyTrader />) },
+        SPEED_TRADER: {
+            icon: <LabelPairedGaugeMaxCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<SpeedTrader />),
+        },
+        AUTOMATED: { icon: <LabelPairedGearCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<Automated />) },
+        CHART: {
+            icon: <LabelPairedChartLineCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            id: is_chart_modal_visible || is_trading_view_modal_visible ? 'id-charts--disabled' : 'id-charts',
+            content: (
+                <Suspense fallback={<ChunkLoader message={localize('Please wait, loading chart...')} />}>
+                    <ChartWrapper show_digits_stats={false} />
+                </Suspense>
+            ),
+        },
+        TUTORIAL: {
+            icon: (
+                <LegacyGuide1pxIcon height='16px' width='16px' fill='currentColor' />
+            ),
+            content: (
+                <div className='tutorials-wrapper'>
+                    <Suspense fallback={<ChunkLoader message={localize('Please wait, loading tutorials...')} />}>
+                        <Tutorial handleTabChange={handleTabChange} />
+                    </Suspense>
+                </div>
+            ),
+        },
+    };
+
     return (
         <React.Fragment>
             <div className='main'>
@@ -373,95 +530,56 @@ const AppWrapper = observer(() => {
                     <div>
                         {!isDesktop && left_tab_shadow && <span className='tabs-shadow tabs-shadow--left' />}{' '}
                         <Tabs active_index={active_tab} className='main__tabs' onTabItemClick={handleTabChange} top>
-                            <div
-                                label={
-                                    <>
-                                        <LabelPairedObjectsColumnCaptionRegularIcon
-                                            height='24px'
-                                            width='24px'
-                                            fill='var(--text-general)'
-                                        />
-                                        <Localize i18n_default_text='Dashboard' />
-                                    </>
-                                }
-                                id='id-dbot-dashboard'
-                            >
-                                <Dashboard handleTabChange={handleTabChange} />
-                            </div>
-                            <div
-                                label={
-                                    <>
-                                        <LabelPairedPuzzlePieceTwoCaptionBoldIcon
-                                            height='24px'
-                                            width='24px'
-                                            fill='var(--text-general)'
-                                        />
-                                        <Localize i18n_default_text='Bot Builder' />
-                                    </>
-                                }
-                                id='id-bot-builder'
-                            />
-                            <div
-                                label={
-                                    <>
-                                        <LabelPairedChartLineCaptionRegularIcon
-                                            height='24px'
-                                            width='24px'
-                                            fill='var(--text-general)'
-                                        />
-                                        <Localize i18n_default_text='Charts' />
-                                    </>
-                                }
-                                id={
-                                    is_chart_modal_visible || is_trading_view_modal_visible
-                                        ? 'id-charts--disabled'
-                                        : 'id-charts'
-                                }
-                            >
-                                <Suspense
-                                    fallback={<ChunkLoader message={localize('Please wait, loading chart...')} />}
-                                >
-                                    <ChartWrapper show_digits_stats={false} />
-                                </Suspense>
-                            </div>
-                            <div
-                                label={
-                                    <>
-                                        <LegacyGuide1pxIcon
-                                            height='16px'
-                                            width='16px'
-                                            fill='var(--text-general)'
-                                            className='icon-general-fill-g-path'
-                                        />
-                                        <Localize i18n_default_text='Tutorials' />
-                                    </>
-                                }
-                                id='id-tutorials'
-                            >
-                                <div className='tutorials-wrapper'>
-                                    <Suspense
-                                        fallback={
-                                            <ChunkLoader message={localize('Please wait, loading tutorials...')} />
+                            {NAV_TABS.map(tab => {
+                                const page = tab_pages[tab.key];
+                                return (
+                                    <div
+                                        key={tab.key}
+                                        label={
+                                            <span className='vd-nav-label'>
+                                                {page.icon}
+                                                <Localize i18n_default_text={tab.label} />
+                                                {tab.key === 'AUTO_STRATEGIES' && <span className='vd-nav-badge'>{localize('new')}</span>}
+                                            </span>
                                         }
+                                        id={page.id ?? tab.id}
                                     >
-                                        <Tutorial handleTabChange={handleTabChange} />
-                                    </Suspense>
-                                </div>
-                            </div>
+                                        {page.content}
+                                    </div>
+                                );
+                            })}
                         </Tabs>
+                        <TickerUnderTabs />
                         {!isDesktop && right_tab_shadow && <span className='tabs-shadow tabs-shadow--right' />}{' '}
                     </div>
                 </div>
             </div>
             <DesktopWrapper>
-                <div className='main__run-strategy-wrapper'>
+                <div className={classNames('main__run-strategy-wrapper', { 'vd-hidden': !show_bot_controls })}>
                     <RunStrategy />
+                </div>
+                {/*
+                 * The run panel (Summary / Transactions / Journal) must not live inside the Run bar:
+                 * the bar is centred with a CSS transform, which traps fixed-position children, and the
+                 * panel ended up below the bottom of the screen — Run worked but showed nothing.
+                 */}
+                <div className={classNames('vd-run-panel-slot', { 'vd-hidden': !show_bot_controls })}>
                     <RunPanel />
                 </div>
                 <ChartModal />
                 <TradingViewModal />
             </DesktopWrapper>
-            <MobileWrapper>{!is_open && <RunPanel />}</MobileWrapper>
+            <MobileWrapper>
+                {/* Hidden (not unmounted) on tool tabs: the run panel keeps its bot listeners while mounted. */}
+                <div className={classNames('vd-run-panel-slot', { 'vd-hidden': !show_bot_controls })}>
+                    {!is_open && <RunPanel />}
+                </div>
+            </MobileWrapper>
+            <GlobalStatus has_bot_bar={show_bot_controls} />
+            <FloatingScanner
+                lifted={show_bot_controls}
+                beside_drawer={isDesktop && is_drawer_open && [DBOT_TABS.BOT_BUILDER, DBOT_TABS.CHART].includes(active_tab)}
+            />
             <Dialog
                 cancel_button_text={cancel_button_text || localize('Cancel')}
                 className='dc-dialog__wrapper--fixed'

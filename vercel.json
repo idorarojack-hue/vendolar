@@ -1,0 +1,12 @@
+{
+    "framework": null,
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "installCommand": "HUSKY=0 npm install",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}

@@ -9,6 +9,9 @@ import OnboardTourHandler from '../tutorials/dbot-tours/onboarding-tour';
 import Announcements from './announcements';
 import Cards from './cards';
 import InfoPanel from './info-panel';
+import ToolDirectory from './tool-directory';
+import VindolarHero from './vindolar-hero';
+import '@/components/vindolar/vindolar.scss';
 
 type TMobileIconGuide = {
     handleTabChange: (active_number: number) => void;
@@ -28,41 +31,36 @@ const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
                     'tab__dashboard--tour-active': active_tour,
                 })}
             >
-                <div className='tab__dashboard__content'>
+                <div className='tab__dashboard__content vd-home'>
                     {client.is_logged_in && (
                         <Announcements is_mobile={!isDesktop} is_tablet={isTablet} handleTabChange={handleTabChange} />
                     )}
+                    <VindolarHero />
+                    <ToolDirectory />
                     <div className='quick-panel'>
-                        <div
-                            className={classNames('tab__dashboard__header', {
-                                'tab__dashboard__header--listed': isDesktop && has_dashboard_strategies,
-                            })}
-                        >
-                            {!has_dashboard_strategies && (
-                                <Text
-                                    className='title'
-                                    as='h2'
-                                    color='prominent'
-                                    size={isDesktop ? 'sm' : 's'}
-                                    lineHeight='xxl'
-                                    weight='bold'
-                                >
-                                    {localize('Load or build your bot')}
-                                </Text>
-                            )}
-                            <Text
-                                as='p'
-                                color='prominent'
-                                lineHeight='s'
-                                size={isDesktop ? 's' : 'xxs'}
-                                className={classNames('subtitle', { 'subtitle__has-list': has_dashboard_strategies })}
+                        {has_dashboard_strategies && (
+                            <div
+                                className={classNames('tab__dashboard__header', {
+                                    'tab__dashboard__header--listed': isDesktop,
+                                })}
                             >
-                                {localize(
-                                    'Import a bot from your computer or Google Drive, build it from scratch, or start with a quick strategy.'
-                                )}
-                            </Text>
-                        </div>
-                        <Cards has_dashboard_strategies={has_dashboard_strategies} is_mobile={!isDesktop} />
+                                <Text
+                                    as='p'
+                                    color='prominent'
+                                    lineHeight='s'
+                                    size={isDesktop ? 's' : 'xxs'}
+                                    className='subtitle subtitle__has-list'
+                                >
+                                    {localize('Your recent bots')}
+                                </Text>
+                            </div>
+                        )}
+                        {/* Tiles are replaced by the hero cards; this keeps the saved-bot list and load dialogs. */}
+                        <Cards
+                            has_dashboard_strategies={has_dashboard_strategies}
+                            is_mobile={!isDesktop}
+                            show_tiles={false}
+                        />
                     </div>
                 </div>
             </div>

@@ -1,21 +1,21 @@
 {
-    "brand_name": "YourBrand",
-    "brand_domain": "yourbrand.com",
+    "brand_name": "Vindolar",
+    "brand_domain": "vindolar.com",
     "brand_hostname": {
-        "staging": "staging.yourbrand.com/dashboard",
-        "production": "yourbrand.com/dashboard"
+        "staging": "staging.vindolar.com/dashboard",
+        "production": "vindolar.com/dashboard"
     },
-    "domain_name": "YourBrand.com",
+    "domain_name": "Vindolar.com",
     "colors": {
-        "primary": "#3b82f6",
-        "secondary": "#64748b",
-        "tertiary": "#8b5cf6",
-        "success": "#10b981",
-        "danger": "#ef4444",
-        "warning": "#f59e0b",
-        "info": "#0ea5e9",
-        "neutral": "#6b7280",
-        "black": "#0f172a",
+        "primary": "#ff9136",
+        "secondary": "#c16b20",
+        "tertiary": "#15c9ef",
+        "success": "#20c58c",
+        "danger": "#f06a50",
+        "warning": "#ffcb05",
+        "info": "#15c9ef",
+        "neutral": "#9ba8c7",
+        "black": "#1a0b03",
         "white": "#ffffff",
         "grey": {
             "50": "#f8fafc",
@@ -32,7 +32,7 @@
     },
     "typography": {
         "font_family": {
-            "primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+            "primary": "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif",
             "secondary": "Georgia, 'Times New Roman', Times, serif",
             "monospace": "'Courier New', Courier, monospace"
         },
@@ -48,9 +48,30 @@
         }
     },
     "color_variants": {
-        "light_variants": [100, 200, 300, 400, 500],
-        "dark_variants": [600, 700, 800, 900],
-        "opacity_variants": [10, 20, 30, 40, 50, 60, 70, 80, 90]
+        "light_variants": [
+            100,
+            200,
+            300,
+            400,
+            500
+        ],
+        "dark_variants": [
+            600,
+            700,
+            800,
+            900
+        ],
+        "opacity_variants": [
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90
+        ]
     },
     "theme_config": {
         "enable_dynamic_themes": true,
@@ -58,14 +79,14 @@
         "css_variable_prefix": "--brand"
     },
     "platform": {
-        "name": "Trading Bot",
+        "name": "Vindolar",
         "logo": {
             "type": "component",
             "component_name": "BrandLogo",
-            "alt_text": "Trading Bot",
+            "alt_text": "Vindolar",
             "link_url": "/",
             "show_text": false,
-            "text": "Trading Bot"
+            "text": "Vindolar"
         },
         "footer": {
             "enable_language_settings": false,
@@ -73,10 +94,10 @@
         },
         "hostname": {
             "production": {
-                "com": "bot.yourbrand.com"
+                "com": "vendolar.vercel.app"
             },
             "staging": {
-                "com": "staging-bot.yourbrand.com"
+                "com": "staging-bot.vindolar.com"
             }
         },
         "auth2_url": {

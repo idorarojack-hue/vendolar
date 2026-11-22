@@ -58,14 +58,18 @@ export default class GoogleDriveStore {
         });
 
         this.root_store = root_store;
-        this.bot_folder_name = `Binary Bot - ${localize('Strategies')}`;
+        this.bot_folder_name = `Vindolar - ${localize('Strategies')}`;
         this.setKey();
         this.client = null;
         this.access_token = localStorage.getItem('google_access_token') ?? '';
-        setTimeout(() => {
-            importExternal('https://accounts.google.com/gsi/client').then(() => this.initialiseClient());
-            importExternal('https://apis.google.com/js/api.js').then(() => this.initialise());
-        }, 3000);
+        // Google Drive saving needs GD_CLIENT_ID. Without it, skip loading Google's scripts
+        // (they would only throw "Missing required parameter client_id" on every page load).
+        if (this.client_id) {
+            setTimeout(() => {
+                importExternal('https://accounts.google.com/gsi/client').then(() => this.initialiseClient());
+                importExternal('https://apis.google.com/js/api.js').then(() => this.initialise());
+            }, 3000);
+        }
     }
 
     is_google_drive_token_valid = true;
@@ -211,7 +215,7 @@ export default class GoogleDriveStore {
 
         const xml_doc = await this.createLoadFilePicker(
             'text/xml,application/xml',
-            localize('Select a Deriv Bot Strategy')
+            localize('Select a Vindolar Strategy')
         );
 
         return xml_doc;

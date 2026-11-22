@@ -162,7 +162,10 @@ const Announcements = observer(({ is_mobile, is_tablet, handleTabChange }: TAnno
     return (
         <div className='announcements'>
             <button
+                type='button'
                 className='announcements__button'
+                aria-label={localize('Announcements')}
+                aria-expanded={is_open_announce_list}
                 onClick={() => {
                     setIsOpenAnnounceList(prevState => !prevState);
                     /* [AI] - Analytics event tracking removed - see migrate-docs/MONITORING_PACKAGES.md for re-implementation guide */

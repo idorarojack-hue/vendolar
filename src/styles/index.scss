@@ -2,6 +2,55 @@
 // Removed IBM Plex Sans Google Font import - now using brand font from brand.config.json
 // Third-party developers can add their own font imports if needed
 
+// ---------------------------------------------------------------------------
+// Vindolar palette: the one place to change the site's colours.
+// Dark brown and orange, flat colours (no gradients) inside the workspace.
+// ---------------------------------------------------------------------------
+:root {
+    // Surfaces, darkest to lightest (sampled from the MarketGuides-style reference)
+    --vd-bar: #0e0e0e; // header and footer
+    --vd-ticker-bg: #070a15; // price ticker
+    --vd-bg: #1b0d04; // page background
+    --vd-field: #221004; // inputs, chart wells
+    --vd-panel: #321707; // cards and panels
+    --vd-panel-hover: #3b1c09;
+    --vd-hero: #401d07; // dashboard hero card
+    --vd-nav: #5f2b08; // tab strip
+    --vd-icon-bg: #542a0e; // icon tiles, chips
+
+    // Lines
+    --vd-border: #51321f;
+    --vd-border-soft: #3d2414;
+    --vd-border-strong: #8a4a1c;
+
+    // Accent
+    --vd-orange: #f97316; // buttons, active tab, highlights
+    --vd-orange-hover: #fb8534;
+    --vd-orange-text: #fb8c3c; // orange text and headings
+    --vd-on-orange: #fff; // text on orange buttons
+    --vd-cyan: #15c9ef;
+
+    // Text
+    --vd-text: #f7f4f2;
+    --vd-muted: #b5a397;
+    --vd-faint: #8e7f74;
+
+    // Meaning
+    --vd-up: #20c58c;
+    --vd-down: #f06a50;
+    --vd-tick-up: #4da3ff; // ticker: price went up
+    --vd-tick-down: #ff5b3a; // ticker: price went down
+    --vd-warn: #ffcb05;
+    --vd-on-warn: #231600;
+
+    // Secondary (dark) buttons
+    --vd-dark-btn: #351b08;
+    --vd-dark-btn-border: #51321f;
+
+    // Type
+    --vd-font-display: 'Space Grotesk', 'DM Sans', sans-serif;
+}
+
 body {
     // Updated to use brand font variable from brand.config.json
     font-family: var(--brand-font-primary);

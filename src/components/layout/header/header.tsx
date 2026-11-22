@@ -171,11 +171,11 @@ const AppHeader = observer(() => {
             ) {
                 return (
                     <div className='auth-actions'>
-                        <Button tertiary onClick={handleLogin}>
+                        <Button tertiary className='vd-header-login' onClick={handleLogin}>
                             <Localize i18n_default_text='Log in' />
                         </Button>
-                        <Button primary_light onClick={handleSignup}>
-                            <Localize i18n_default_text='Sign up' />
+                        <Button primary className='vd-header-start' onClick={handleSignup}>
+                            <Localize i18n_default_text='Get started' />
                         </Button>
                     </div>
                 );
@@ -236,6 +236,12 @@ const AppHeader = observer(() => {
                 <Wrapper variant='left'>
                     <MobileMenu onLogout={handleLogout} />
                     <AppLogo />
+                    {/* Phones reach Reports from the tab strip and the menu; the link would push the header off-screen. */}
+                    {isDesktop && (
+                        <a className='app-header__reports' href='#reports'>
+                            <Localize i18n_default_text='Reports' />
+                        </a>
+                    )}
                     {isDesktop ? <MenuItems /> : renderAccountSection('left')}
                 </Wrapper>
                 <Wrapper variant='right'>{renderAccountSection('right')}</Wrapper>

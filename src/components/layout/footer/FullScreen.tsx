@@ -12,6 +12,7 @@ const FullScreen = () => {
             as='button'
             className='app-footer__icon'
             onClick={toggleFullScreenMode}
+            aria-label={localize('Full screen')}
             tooltipContent={localize('Full screen')}
         >
             <LegacyFullscreen1pxIcon iconSize='xs' />

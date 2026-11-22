@@ -1,0 +1,149 @@
+@use 'components/shared/styles/mixins' as *;
+
+// "Tools & Features" grid on the dashboard. Flat colours from src/styles/index.scss.
+.vd-tools {
+    width: 100%;
+    padding: 3.2rem 0 2.4rem;
+
+    &__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.6rem;
+        margin-bottom: 1.6rem;
+
+        p {
+            margin: 0.4rem 0 0;
+            color: var(--vd-muted);
+            font-size: 1.3rem;
+        }
+    }
+
+    &__title {
+        margin: 0;
+        color: #fff;
+        font-family: var(--vd-font-display);
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    &__filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+
+        button {
+            height: 3.4rem;
+            padding: 0 1.6rem;
+            border: 1px solid var(--vd-border);
+            border-radius: 10rem;
+            background: var(--vd-panel);
+            color: #fff;
+            font: inherit;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+
+            &:hover:not(.is-active) {
+                border-color: var(--vd-border-strong);
+            }
+
+            &.is-active {
+                border-color: var(--vd-orange);
+                background: var(--vd-orange);
+                color: var(--vd-on-orange);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--vd-orange);
+                outline-offset: 2px;
+            }
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.6rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        @media (width <= 1200px) {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        @media (width <= 900px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @include mobile-screen {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1rem;
+        }
+
+        li {
+            display: flex;
+        }
+
+        > li > button {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            grid-template-rows: 1fr auto;
+            gap: 0.4rem 1.4rem;
+            width: 100%;
+            min-height: 14.2rem;
+            padding: 1.8rem 1.8rem 1.6rem;
+            border: 1px solid var(--vd-border);
+            border-radius: 1.2rem;
+            background: var(--vd-panel);
+            font: inherit;
+            text-align: start;
+            cursor: pointer;
+            transition:
+                background-color 0.15s ease,
+                border-color 0.15s ease;
+
+            &:hover {
+                border-color: var(--vd-border-strong);
+                background: var(--vd-panel-hover);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--vd-orange);
+                outline-offset: 2px;
+            }
+
+            em {
+                grid-column: 1 / -1;
+                justify-self: end;
+                align-self: end;
+                color: var(--vd-orange);
+                font-size: 1.3rem;
+                font-style: normal;
+                font-weight: 700;
+            }
+        }
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        min-width: 0;
+
+        strong {
+            color: #fff;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        span {
+            color: var(--vd-muted);
+            font-size: 1.35rem;
+            line-height: 1.5;
+        }
+    }
+}

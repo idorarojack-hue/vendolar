@@ -42,3 +42,22 @@ export const setAuthData = (authData: TAuthData | null) => {
     }
     authData$.next(authData);
 };
+
+/** Replace one account's balance in the live account list after a buy, sell, or balance update. */
+export const publishLiveBalance = (loginid: string, balance: number) => {
+    if (!loginid || !Number.isFinite(balance)) return;
+
+    const current = account_list$.getValue() ?? [];
+    let changed = false;
+    const next = current.map(account => {
+        if (account.loginid !== loginid || account.balance === balance) return account;
+        changed = true;
+        return { ...account, balance };
+    });
+    if (changed) account_list$.next(next);
+
+    const auth = authData$.getValue();
+    if (auth?.loginid === loginid && auth.balance !== balance) {
+        authData$.next({ ...auth, balance });
+    }
+};

@@ -67,12 +67,14 @@ const updateBrandColorsInThemes = () => {
         if (aiEndMarker !== -1) {
             endPoint = themesContent.indexOf('\n', aiEndMarker) + 1;
         } else {
-            // Find end by looking for next CSS section or end of root block
+            // The generated section is followed by the "// App Cards" block (or the theme classes).
+            // Replace everything up to there, so stale duplicate blocks from earlier runs are removed.
+            // (Previously the end was the next `/*` comment, which sits inside the generated block
+            // itself, so each run left old colour declarations behind that overrode the new ones.)
             const nextSection = themesContent.indexOf('\n    // App Cards', brandCommentStart);
-            const nextComment = themesContent.indexOf('\n    /*', brandCommentStart + 100); // Skip current comment
             const nextThemeClass = themesContent.indexOf('\n    .theme--', brandCommentStart);
 
-            endPoint = Math.min(...[nextSection, nextComment, nextThemeClass].filter(pos => pos > -1));
+            endPoint = Math.min(...[nextSection, nextThemeClass].filter(pos => pos > -1));
             if (endPoint === Infinity) {
                 // Fallback - find next blank lines
                 endPoint = themesContent.indexOf('\n\n    ', brandCommentStart + 100);
@@ -104,7 +106,9 @@ const updateBrandColorsInThemes = () => {
     const afterSection =
         endPoint > insertionPoint ? themesContent.substring(endPoint) : themesContent.substring(insertionPoint);
 
-    themesContent = beforeSection + '\n\n' + brandColorLines.join('\n') + '\n' + afterSection;
+    // Trim surrounding blank lines so repeated runs produce identical output.
+    themesContent =
+        beforeSection.replace(/\s*$/, '\n') + '\n' + brandColorLines.join('\n') + '\n' + afterSection.replace(/^\n*/, '\n');
 
     // Write the updated file
     fs.writeFileSync(themesPath, themesContent, 'utf8');

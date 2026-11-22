@@ -180,17 +180,27 @@
             }
 
             @include desktop-screen {
-                padding: 80px 216px 0;
+                // Vindolar: full-width hero on top, saved bots underneath, page scrolls.
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.6rem;
+                padding: 1.6rem 2.4rem 2.4rem;
+                overflow-y: auto;
             }
 
             @include mobile-or-tablet-screen {
                 height: calc(100vh - 19rem);
                 align-items: flex-start;
                 padding: 1.6rem;
+                overflow-y: auto;
             }
 
             .quick-panel {
                 flex: 1 1 44%;
+
+                @include desktop-screen {
+                    flex: 0 0 auto;
+                }
             }
 
             .preview-panel {
@@ -303,7 +313,10 @@
 
         &__info-panel {
             position: relative;
-            background-color: var(--general-main-1);
+            background-color: var(--vd-panel);
+            color: var(--vd-text);
+            border: 1px solid rgb(255 145 54 / 22%);
+            border-radius: 1.6rem;
             padding: 2.4rem;
             margin-inline-start: 1.6rem;
             display: none;
@@ -348,6 +361,15 @@
 
                     @include mobile-screen {
                         justify-content: space-around;
+                    }
+                }
+
+                // Tiles replaced by the Vindolar hero cards; keep the element (it hosts dialogs) but take no space.
+                &--hidden {
+                    padding: 0;
+
+                    @include mobile-or-tablet-screen {
+                        padding: 0;
                     }
                 }
             }

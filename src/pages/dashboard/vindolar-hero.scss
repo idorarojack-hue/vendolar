@@ -1,0 +1,499 @@
+@use 'components/shared/styles/mixins' as *;
+
+// Dashboard home: hero (greeting, robot, market overview) and the four stat cards.
+// Flat colours only, from the palette in src/styles/index.scss.
+
+// Centre the dashboard in a 124rem column, like a trading terminal home page.
+.tab__dashboard__content.vd-home {
+    > .vd-dash__hero,
+    > .vd-dash__stats,
+    > .vd-tools,
+    > .quick-panel {
+        width: 100%;
+        max-width: 124rem;
+        margin-inline: auto;
+    }
+
+    @include desktop-screen {
+        padding-top: 3.2rem;
+    }
+
+    @include mobile-or-tablet-screen {
+        > * + * {
+            margin-top: 1.6rem;
+        }
+    }
+}
+
+.vd-dash {
+    // ---------- hero ----------
+    &__hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.8fr) minmax(30rem, 0.95fr);
+        gap: 2rem;
+        align-items: center;
+        width: 100%;
+        padding: 4.4rem 2.8rem 3rem 3.6rem;
+        border: 1px solid var(--vd-border);
+        border-radius: 1.4rem;
+        background: var(--vd-hero);
+        color: var(--vd-text);
+
+        @media (width <= 1180px) {
+            grid-template-columns: minmax(0, 1fr) minmax(28rem, 0.9fr);
+
+            .vd-dash__robot {
+                display: none;
+            }
+        }
+
+        @media (width <= 760px) {
+            grid-template-columns: minmax(0, 1fr);
+            padding: 4rem 1.6rem 1.6rem;
+        }
+    }
+
+    &__live {
+        position: absolute;
+        top: 1.6rem;
+        inset-inline-end: 2.4rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0;
+        color: var(--vd-up);
+        font-size: 1.3rem;
+        font-weight: 700;
+
+        span {
+            width: 0.9rem;
+            height: 0.9rem;
+            border-radius: 50%;
+            background: var(--vd-up);
+            box-shadow: 0 0 0 0.3rem rgb(32 197 140 / 25%);
+        }
+    }
+
+    &__intro {
+        min-width: 0;
+
+        h1 {
+            margin: 0;
+            color: #fff;
+            font-family: var(--vd-font-display);
+            font-size: clamp(2.8rem, 3vw, 3.8rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+
+            em {
+                color: var(--vd-orange);
+                font-style: normal;
+            }
+        }
+    }
+
+    &__eyebrow {
+        margin: 0 0 1rem;
+        color: var(--vd-orange);
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+    }
+
+    &__lead {
+        max-width: 44rem;
+        margin: 1.4rem 0 0;
+        color: #d9c9bc;
+        font-size: 1.5rem;
+        line-height: 1.65;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        margin-top: 2.8rem;
+    }
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        height: 4.6rem;
+        padding: 0 2.2rem;
+        border: 1px solid transparent;
+        border-radius: 0.8rem;
+        font: inherit;
+        font-size: 1.4rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease;
+
+        span {
+            font-size: 1.6rem;
+        }
+
+        &--orange {
+            background: var(--vd-orange);
+            color: var(--vd-on-orange);
+
+            &:hover {
+                background: var(--vd-orange-hover);
+            }
+        }
+
+        &--dark {
+            border-color: var(--vd-dark-btn-border);
+            background: var(--vd-dark-btn);
+            color: #fff;
+
+            &:hover {
+                border-color: var(--vd-border-strong);
+            }
+        }
+
+        &:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+    }
+
+    &__robot {
+        width: 100%;
+        max-width: 30rem;
+        height: auto;
+        justify-self: center;
+    }
+
+    // ---------- market overview ----------
+    &__market {
+        min-width: 0;
+        padding: 1.6rem 1.6rem 1.2rem;
+        border: 1px solid #2a0f00;
+        border-radius: 1.2rem;
+        background: var(--vd-field);
+    }
+
+    &__market-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+
+        h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+    }
+
+    &__frames {
+        display: flex;
+        gap: 0.2rem;
+
+        button {
+            min-width: 3.2rem;
+            height: 2.4rem;
+            padding: 0 0.6rem;
+            border: none;
+            border-radius: 0.5rem;
+            background: transparent;
+            color: var(--vd-muted);
+            font: inherit;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+
+            &.is-active {
+                background: var(--vd-icon-bg);
+                color: #fff;
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--vd-orange);
+            }
+        }
+    }
+
+    &__market-name {
+        margin: 1.2rem 0 0;
+        color: var(--vd-muted);
+        font-size: 1.2rem;
+    }
+
+    &__market-price {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.8rem;
+        margin: 0.2rem 0 0;
+        color: #fff;
+        font-size: 2.6rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+
+        span {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .is-up {
+            color: var(--vd-up);
+        }
+
+        .is-down {
+            color: var(--vd-down);
+        }
+    }
+
+    &__chart {
+        position: relative;
+        height: 11rem;
+        margin-top: 0.8rem;
+        padding-inline-end: 5.6rem;
+
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+
+            &.is-up {
+                --vd-chart-color: var(--vd-up);
+            }
+
+            &.is-down {
+                --vd-chart-color: var(--vd-down);
+            }
+        }
+    }
+
+    &__chart-area {
+        fill: var(--vd-chart-color);
+        fill-opacity: 0.14;
+    }
+
+    &__chart-line {
+        fill: none;
+        stroke: var(--vd-chart-color);
+        stroke-width: 1.6;
+        stroke-linejoin: round;
+    }
+
+    &__chart-empty {
+        display: grid;
+        place-items: center;
+        height: 100%;
+        margin: 0;
+        color: var(--vd-muted);
+        font-size: 1.2rem;
+    }
+
+    &__levels {
+        position: absolute;
+        inset: 0 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 5.2rem;
+        margin: 0;
+        padding: 0;
+        color: var(--vd-muted);
+        font-size: 1rem;
+        list-style: none;
+        text-align: end;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__last {
+        position: absolute;
+        inset-inline-end: 0;
+        padding: 0.1rem 0.4rem;
+        border-radius: 0.3rem;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        transform: translateY(-50%);
+        font-variant-numeric: tabular-nums;
+
+        &.is-up {
+            background: #13805a;
+        }
+
+        &.is-down {
+            background: #c2402a;
+        }
+    }
+
+    &__times {
+        display: flex;
+        justify-content: space-between;
+        margin: 0.6rem 5.6rem 0 0;
+        padding: 0;
+        color: var(--vd-muted);
+        font-size: 1rem;
+        list-style: none;
+        font-variant-numeric: tabular-nums;
+    }
+
+    // ---------- stat cards ----------
+    &__stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.6rem;
+        width: 100%;
+        margin-top: 0.6rem;
+
+        @media (width <= 1000px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (width <= 480px) {
+            gap: 1rem;
+        }
+    }
+
+    &__stat {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1.4rem;
+        min-width: 0;
+        padding: 2rem 1.8rem;
+        border: 1px solid var(--vd-border);
+        border-radius: 1.2rem;
+        background: var(--vd-panel);
+        color: #fff;
+        font: inherit;
+        text-align: start;
+        cursor: pointer;
+        transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease;
+
+        &:hover {
+            border-color: var(--vd-border-strong);
+            background: var(--vd-panel-hover);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--vd-orange);
+            outline-offset: 2px;
+        }
+
+        @media (width <= 480px) {
+            gap: 1rem;
+            padding: 1.4rem 1.2rem;
+        }
+    }
+
+    &__stat-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+
+        strong {
+            font-family: var(--vd-font-display);
+            font-size: 2.6rem;
+            line-height: 1.1;
+        }
+
+        span {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        small {
+            color: var(--vd-orange);
+            font-size: 1.2rem;
+        }
+    }
+
+    &__stat-arrow {
+        position: absolute;
+        top: 1.4rem;
+        inset-inline-end: 1.4rem;
+        color: var(--vd-muted);
+    }
+
+    // ---------- coloured icon tiles (stats + tools) ----------
+    &__icon {
+        display: grid;
+        flex: 0 0 auto;
+        place-items: center;
+        width: 5rem;
+        height: 5rem;
+        border: 1px solid;
+        border-radius: 1.2rem;
+
+        @media (width <= 480px) {
+            width: 4.2rem;
+            height: 4.2rem;
+        }
+
+        &--blue {
+            border-color: rgb(96 165 250 / 30%);
+            background: rgb(96 165 250 / 14%);
+            color: #60a5fa;
+        }
+
+        &--purple {
+            border-color: rgb(192 132 252 / 30%);
+            background: rgb(192 132 252 / 14%);
+            color: #c084fc;
+        }
+
+        &--teal {
+            border-color: rgb(45 212 191 / 30%);
+            background: rgb(45 212 191 / 12%);
+            color: #2dd4bf;
+        }
+
+        &--violet {
+            border-color: rgb(167 139 250 / 30%);
+            background: rgb(167 139 250 / 14%);
+            color: #a78bfa;
+        }
+
+        &--amber {
+            border-color: rgb(251 191 36 / 30%);
+            background: rgb(251 191 36 / 14%);
+            color: #fbbf24;
+        }
+
+        &--red {
+            border-color: rgb(248 113 113 / 30%);
+            background: rgb(248 113 113 / 14%);
+            color: #f87171;
+        }
+
+        &--green {
+            border-color: rgb(74 222 128 / 30%);
+            background: rgb(74 222 128 / 12%);
+            color: #4ade80;
+        }
+
+        &--sky {
+            border-color: rgb(56 189 248 / 30%);
+            background: rgb(56 189 248 / 12%);
+            color: #38bdf8;
+        }
+
+        &--pink {
+            border-color: rgb(244 114 182 / 30%);
+            background: rgb(244 114 182 / 14%);
+            color: #f472b6;
+        }
+
+        &--orange {
+            border-color: rgb(249 115 22 / 35%);
+            background: rgb(249 115 22 / 14%);
+            color: var(--vd-orange-text);
+        }
+    }
+}

@@ -1,0 +1,202 @@
+@use 'components/shared/styles/mixins' as *;
+
+.vd-page.vd-signal-ai {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 1.6rem 0 1.2rem;
+    background:
+        radial-gradient(circle at 20% 10%, rgb(249 115 22 / 8%), transparent 32%),
+        var(--vd-bg);
+
+    @include mobile-or-tablet-screen {
+        align-items: stretch;
+        overflow: auto;
+        height: auto;
+        padding: 1.2rem 1.2rem 9rem;
+    }
+}
+
+.vd-signal-ai__setup,
+.vd-signal-ai__window {
+    width: min(72rem, 100%);
+}
+
+.vd-signal-ai__setup {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    padding: 2.4rem;
+    border: 1px solid var(--vd-border);
+    border-radius: 1.4rem;
+    background: var(--vd-panel);
+
+    h2 {
+        color: var(--vd-orange-text);
+        font-size: 2.8rem;
+        font-weight: 800;
+    }
+
+    p {
+        margin: 0;
+        color: #f7f4f2;
+        font-size: 1.4rem;
+        line-height: 1.5;
+    }
+
+    .vd-segmented {
+        display: inline-flex;
+        width: fit-content;
+        padding: 0.3rem;
+        border-radius: 0.8rem;
+        background: var(--vd-field);
+
+        button {
+            padding: 0.8rem 1.6rem;
+            border: none;
+            border-radius: 0.6rem;
+            background: transparent;
+            color: #f7f4f2;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+
+            &.is-active {
+                background: var(--vd-orange);
+                color: #fff;
+            }
+        }
+    }
+}
+
+.vd-signal-ai__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+
+    @include mobile-or-tablet-screen {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vd-page.vd-signal-ai .vd-signal-ai__go {
+    align-self: flex-start;
+    min-width: 16rem;
+    background: #20c58c;
+    color: #06281c;
+}
+
+.vd-signal-ai__window {
+    display: flex;
+    flex-direction: column;
+    height: min(62rem, 100%);
+    overflow: hidden;
+    border: 1px solid var(--vd-orange);
+    border-radius: 1.2rem;
+    background: #140a05;
+    box-shadow: 0 0 0 1px rgb(249 115 22 / 25%), 0 18px 40px rgb(0 0 0 / 45%);
+}
+
+.vd-signal-ai__bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--vd-border);
+    background: #1f1008;
+
+    h2 {
+        margin: 0;
+        color: #f7f4f2;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+}
+
+.vd-signal-ai__dots {
+    display: inline-flex;
+    gap: 0.45rem;
+
+    i {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: var(--vd-down);
+
+        &:nth-child(2) {
+            background: var(--vd-warn);
+        }
+
+        &:nth-child(3) {
+            background: var(--vd-up);
+        }
+    }
+}
+
+.vd-signal-ai__close {
+    width: 3.2rem;
+    height: 3.2rem;
+    border: none;
+    border-radius: 0.6rem;
+    background: var(--vd-down);
+    color: #fff;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.vd-signal-ai__log {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 1.2rem 1.6rem;
+    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    font-size: 1.3rem;
+    line-height: 1.7;
+
+    p {
+        margin: 0;
+    }
+
+    time {
+        margin-inline-end: 0.8rem;
+        color: rgb(247 244 242 / 45%);
+    }
+
+    .is-up {
+        color: var(--vd-up);
+    }
+
+    .is-down {
+        color: var(--vd-down);
+    }
+
+    .is-warn {
+        color: var(--vd-warn);
+    }
+
+    .is-info {
+        color: #f7f4f2;
+    }
+}
+
+.vd-signal-ai__window footer {
+    display: flex;
+    justify-content: center;
+    padding: 1.2rem;
+    border-top: 1px solid var(--vd-border);
+}
+
+.vd-signal-ai__stop {
+    min-height: 4rem;
+    padding: 0 2rem;
+    border: none;
+    border-radius: 0.8rem;
+    background: var(--vd-down);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+}

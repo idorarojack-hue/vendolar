@@ -1,6 +1,10 @@
 @use 'components/shared/styles/constants' as *;
 @use 'components/shared/styles/mixins' as *;
 
+// Vindolar navigation colours (flat, from the palette in src/styles/index.scss)
+$vd-nav-bg-start: var(--vd-nav);
+$vd-nav-bg-end: var(--vd-nav);
+
 .run-panel {
     // fix for the RTL issue on tab active line
     .dc-tabs__active-line {
@@ -18,21 +22,150 @@
 
     &--left {
         left: 0;
-        background: linear-gradient(-88.07deg, transparent 1.63%, var(--general-section-1) 50.02%);
+        background: $vd-nav-bg-start;
     }
 
     &--right {
         right: 0;
-        background: linear-gradient(88.07deg, transparent 1.63%, var(--general-section-1) 50.02%);
+        background: $vd-nav-bg-end;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Vindolar navigation bar (the main tab strip: Dashboard, Bot Builder, ...)
+// ---------------------------------------------------------------------------
+.main .main__container {
+    // Keep the tab grid as wide as the window: the tab strip scrolls inside it instead of
+    // stretching the whole page (there are more tabs than fit on most screens).
+    .dc-tabs.dc-tabs--main__tabs {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dc-tabs__list--header--main__tabs {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .dc-tabs__list.dc-tabs__list--main__tabs {
+        align-items: center;
+        gap: 0.2rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 0;
+        background: var(--vd-nav);
+        box-shadow: none;
+
+        @include desktop-screen {
+            // When the tabs don't fit, scroll sideways with a thin visible scrollbar
+            // (mouse wheel + Shift, trackpad, or drag the bar) so every tab stays reachable.
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgb(255 255 255 / 35%) transparent;
+
+            &::-webkit-scrollbar {
+                height: 0.6rem;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                border-radius: 1rem;
+                background: rgb(255 255 255 / 35%);
+            }
+        }
+
+        @include mobile-or-tablet-screen {
+            border-radius: 0;
+            padding: 0;
+        }
+    }
+
+    .vd-nav-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .vd-nav-badge {
+        padding: 0.1rem 0.5rem;
+        border-radius: 0.4rem;
+        background: #ff3b30;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.5rem;
+        letter-spacing: 0;
+        text-transform: lowercase;
+    }
+
+    .dc-tabs__item.dc-tabs__item--main__tabs {
+        display: inline-flex;
+        align-items: center;
+        height: 3.6rem;
+        padding: 0 1.2rem;
+        border-radius: 0.7rem;
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        white-space: nowrap;
+        transition: background-color 0.15s ease;
+
+        svg,
+        svg path {
+            fill: currentcolor;
+        }
+
+        &:hover:not(.dc-tabs__active) {
+            background: rgb(0 0 0 / 18%);
+            color: #fff;
+        }
+
+        &.dc-tabs__active {
+            background: var(--vd-orange);
+            color: var(--vd-on-orange);
+            border-radius: 0.7rem;
+            box-shadow: none;
+        }
+
+        @include mobile-or-tablet-screen {
+            height: 4.2rem;
+            padding: 0 1.2rem;
+        }
+    }
+
+    .dc-tabs--main__tabs .dc-tabs__active-line {
+        display: none;
     }
 }
 
 .main {
     display: flex;
+    flex-direction: column;
     overflow: hidden;
     width: 100%;
-    height: calc(100vh - 9rem);
-    padding: 1.6rem;
+    height: calc(100vh - 9.2rem);
+    padding: 0;
+
+    // Same left and right inset on every tab, centred like the dashboard.
+    // The inset must stay the page brown; the tabs shell is otherwise white.
+    .dc-tabs__content--main__tabs {
+        box-sizing: border-box;
+        background: var(--vd-bg);
+
+        @include desktop-screen {
+            padding-inline: 2.4rem;
+
+            > .vd-page,
+            > .tab__dashboard,
+            > .bot-builder,
+            > .dashboard__chart-wrapper,
+            > .vd-analysis,
+            > .vd-manual,
+            > .tutorials-wrapper {
+                width: 100%;
+                max-width: 124rem;
+                margin-inline: auto;
+            }
+        }
+    }
 
     @include mobile-or-tablet-screen {
         height: calc(100vh - 6rem);
@@ -41,6 +174,8 @@
 
     &__container {
         position: relative;
+        flex: 1;
+        min-height: 0;
         border: none;
         max-width: 100%;
         width: 100%;
@@ -182,7 +317,18 @@
         z-index: 2;
 
         @include desktop-screen {
-            position: absolute;
+            // Vindolar: Run + bot status live in a pill at the bottom centre (over the footer),
+            // so they never cover the navigation tabs.
+            position: fixed;
+            top: auto;
+            bottom: 0.2rem;
+            inset-inline: 50% auto;
+            z-index: 10;
+            padding: 0.3rem;
+            border-radius: 1rem;
+            background: var(--general-main-1);
+            box-shadow: 0 -1px 10px rgb(0 0 0 / 18%);
+            transform: translateX(-50%);
         }
 
         .animation {
@@ -753,4 +899,45 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+// Run panel (Summary / Transactions / Journal) on Bot Builder and Chart: pinned to the top right,
+// just under the tab strip + ticker. It used to sit inside the Run bar, so when the Run bar moved
+// to the bottom of the screen the panel went with it and opened off-screen.
+.vd-run-panel-slot {
+    // Deriv theme colours remapped so the panel matches the brown workspace.
+    --general-main-1: var(--vd-panel);
+    --general-main-2: var(--vd-panel);
+    --general-section-1: var(--vd-field);
+    --general-section-2: var(--vd-field);
+    --general-hover: var(--vd-panel-hover);
+    --text-prominent: var(--vd-text);
+    --text-general: var(--vd-muted);
+    --text-less-prominent: var(--vd-faint);
+    --border-normal: var(--vd-border);
+    --border-disabled: var(--vd-border-soft);
+
+    @include desktop-screen {
+        position: absolute;
+        top: 8.2rem;
+        inset-inline-end: 0;
+        z-index: 2;
+
+        // Stop above the Run bar and footer at the bottom of the screen.
+        .run-panel__container {
+            height: calc(100vh - 23.4rem) !important;
+            border-inline-start: 1px solid var(--vd-border);
+        }
+
+        // Shorter panel → shorter Summary/Transactions/Journal area, so the statistics
+        // (stake, payout, runs, won, lost, profit) stay fully visible above Reset.
+        .run-panel__content > .dc-tabs {
+            height: auto !important;
+        }
+
+        .run-panel__content .dc-tabs__content,
+        .run-panel-tab__content {
+            height: calc(100vh - 49.6rem) !important;
+        }
+    }
 }

@@ -6,6 +6,7 @@ import Text from '@/components/shared_ui/text';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { useStore } from '@/hooks/useStore';
 import { LegacyClose1pxIcon } from '@deriv/quill-icons/Legacy';
+import { localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import { SIDEBAR_INTRO } from './constants';
 
@@ -49,9 +50,15 @@ const InfoPanel = observer(() => {
 
     const renderInfo = () => (
         <div className='db-info-panel'>
-            <div data-testid='close-icon' className='db-info-panel__close-action' onClick={handleClose}>
-                <LegacyClose1pxIcon height='18px' width='18px' fill='var(--text-prominent)' />
-            </div>
+            <button
+                type='button'
+                data-testid='close-icon'
+                className='db-info-panel__close-action'
+                aria-label={localize('Close welcome panel')}
+                onClick={handleClose}
+            >
+                <LegacyClose1pxIcon height='18px' width='18px' fill='currentColor' />
+            </button>
 
             {SIDEBAR_INTRO().map(sidebar_item => {
                 const { label, content, link } = sidebar_item;

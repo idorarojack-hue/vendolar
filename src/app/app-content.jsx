@@ -3,15 +3,17 @@ import { observer } from 'mobx-react-lite';
 import { ToastContainer } from 'react-toastify';
 import AuthLoadingWrapper from '@/components/auth-loading-wrapper';
 import useLiveChat from '@/components/chat/useLiveChat';
-import ChunkLoader from '@/components/loader/chunk-loader';
 import { getUrlBase } from '@/components/shared';
 import TransactionDetailsModal from '@/components/transaction-details';
+import BootScreen from '@/components/vindolar/boot-screen';
+import Landing from '@/components/vindolar/landing/landing';
 import { api_base, ApiHelpers, ServerTime } from '@/external/bot-skeleton';
 import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
 import { useApiBase } from '@/hooks/useApiBase';
 import useDevMode from '@/hooks/useDevMode';
 import { useStore } from '@/hooks/useStore';
 import useThemeSwitcher from '@/hooks/useThemeSwitcher';
+import { OAuthTokenExchangeService } from '@/services/oauth-token-exchange.service';
 import { ThemeProvider } from '@deriv-com/quill-ui';
 import { setSmartChartsPublicPath } from '@deriv-com/smartcharts-champion';
 import { localize } from '@deriv-com/translations';
@@ -23,6 +25,12 @@ import Main from '../pages/main';
 import './app.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import '../components/bot-notification/bot-notification.scss';
+
+/** Set when a visitor chooses "Explore tools" on the landing page (this browser tab only). */
+const GUEST_KEY = 'vd_guest';
+/** Longest the boot screen waits for a saved session to be verified. */
+const AUTH_WAIT_MS = 10000;
+const hasOAuthCode = () => new URLSearchParams(window.location.search).has('code');
 
 const AppContent = observer(() => {
     const [is_api_initialized, setIsApiInitialized] = React.useState(false);
@@ -160,24 +168,72 @@ const AppContent = observer(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [is_api_initialized, client.loginid]);
 
+    // A visitor with a saved Deriv session (or one coming back from the Deriv login page)
+    // waits on the boot screen until the account is verified, instead of seeing the
+    // public landing page flash up first. The wait is capped so a failed login can't hang it.
+    const has_session = OAuthTokenExchangeService.isAuthenticated() || hasOAuthCode();
+    const [is_auth_wait_over, setIsAuthWaitOver] = React.useState(false);
+    React.useEffect(() => {
+        if (!has_session || client.is_logged_in) return undefined;
+        const timer = setTimeout(() => setIsAuthWaitOver(true), AUTH_WAIT_MS);
+        return () => clearTimeout(timer);
+    }, [has_session, client.is_logged_in]);
+    const is_waiting_for_account = has_session && !client.is_logged_in && !is_auth_wait_over;
+
+    const is_booting = is_loading || is_waiting_for_account;
+    const [is_boot_visible, setIsBootVisible] = React.useState(true);
+    React.useEffect(() => {
+        if (is_booting) setIsBootVisible(true);
+    }, [is_booting]);
+
+    const [is_guest, setIsGuest] = React.useState(() => sessionStorage.getItem(GUEST_KEY) === '1');
+    const exploreAsGuest = React.useCallback(() => {
+        sessionStorage.setItem(GUEST_KEY, '1');
+        setIsGuest(true);
+    }, []);
+    React.useEffect(() => {
+        // Once someone logs in, logging out later should bring back the landing page.
+        if (client.is_logged_in) {
+            sessionStorage.removeItem(GUEST_KEY);
+            setIsGuest(false);
+        }
+    }, [client.is_logged_in]);
+    const show_landing = !client.is_logged_in && !has_session && !is_guest;
+
     if (common?.error) return null;
 
-    return is_loading ? (
-        <ChunkLoader message={localize('Initializing Deriv Bot account...')} />
-    ) : (
-        <AuthLoadingWrapper>
-            <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
-                <BlocklyLoading />
-                <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
-                    <Audio />
-                    <Main />
-                    <BotBuilder />
-                    <BotStopped />
-                    <TransactionDetailsModal />
-                    <ToastContainer limit={3} draggable={false} />
-                </div>
-            </ThemeProvider>
-        </AuthLoadingWrapper>
+    let boot_stage = { target: 96, status: localize('Opening your workspace') };
+    if (!is_api_initialized) boot_stage = { target: 58, status: localize('Opening the market connection') };
+    else if (is_loading) boot_stage = { target: 84, status: localize('Loading markets') };
+    else if (is_waiting_for_account) boot_stage = { target: 94, status: localize('Verifying your Deriv account') };
+
+    return (
+        <>
+            {!is_booting && show_landing && <Landing onExplore={exploreAsGuest} />}
+            {!is_booting && !show_landing && (
+                <AuthLoadingWrapper>
+                    <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
+                        <BlocklyLoading />
+                        <div className='bot-dashboard bot' data-testid='dt_bot_dashboard'>
+                            <Audio />
+                            <Main />
+                            <BotBuilder />
+                            <BotStopped />
+                            <TransactionDetailsModal />
+                            <ToastContainer limit={3} draggable={false} />
+                        </div>
+                    </ThemeProvider>
+                </AuthLoadingWrapper>
+            )}
+            {is_boot_visible && (
+                <BootScreen
+                    target={boot_stage.target}
+                    status={boot_stage.status}
+                    done={!is_booting}
+                    onExit={() => setIsBootVisible(false)}
+                />
+            )}
+        </>
     );
 });
 

@@ -26,11 +26,12 @@ export const WS_SERVERS = {
 // Helper Functions
 // =============================================================================
 
-// Helper to check if we're on production domains
+// Production is every host except the staging domain. Localhost stays on the live Deriv
+// connection, and so does the deployed site. Only the staging hostname uses staging auth.
 export const isProduction = () => {
     const hostname = window.location.hostname;
-    const productionDomains = Object.values(PRODUCTION_DOMAINS) as string[];
-    return productionDomains.includes(hostname);
+    const stagingDomains = Object.values(STAGING_DOMAINS) as string[];
+    return !stagingDomains.includes(hostname);
 };
 
 export const isLocal = () => /localhost(:\d+)?$/i.test(window.location.hostname);
@@ -244,7 +245,8 @@ export const generateOAuthURL = async (prompt?: string) => {
             // Build redirect URL
             const protocol = window.location.protocol;
             const host = window.location.host;
-            const redirectUrl = `${protocol}//${host}`;
+            // Deriv matches this string exactly. The registered URL must include the trailing slash.
+            const redirectUrl = `${protocol}//${host}/`;
             const scopes = 'trade';
 
             // Build OAuth URL with PKCE parameters

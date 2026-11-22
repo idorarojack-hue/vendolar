@@ -1,13 +1,63 @@
 .app-header {
     &__logo {
-        padding-inline-start: 3.2rem;
-        padding-inline-end: 2rem;
-        height: 32px;
         display: flex;
         align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+    }
 
-        &-text {
-            margin-left: 8px;
+    &__lockup {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.3rem;
+        line-height: 1;
+    }
+
+    &__name {
+        color: #f7f4f2;
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.03rem;
+    }
+
+    &__powered {
+        color: rgb(247 244 242 / 78%);
+        font-size: 1.2rem;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+
+        strong {
+            color: #ff444f;
+            font-weight: 800;
         }
     }
+
+    &__reports {
+        display: inline-flex;
+        align-items: center;
+        align-self: center;
+        height: 3.2rem;
+        margin-inline-start: 1.8rem;
+        padding: 0 1.4rem;
+        border-inline-start: 1px solid rgb(247 244 242 / 18%);
+        color: #f7f4f2;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-decoration: none;
+
+        &:hover {
+            color: var(--vd-orange-text);
+        }
+    }
+}
+
+// Phones: brand name next to the icon, hidden once the account balance is in the header.
+.app-header__name--mobile {
+    font-size: 1.7rem;
+}
+
+.app-header:has(.acc-info) .app-header__name--mobile {
+    display: none;
 }

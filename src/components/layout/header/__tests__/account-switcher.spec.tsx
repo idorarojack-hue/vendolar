@@ -32,6 +32,7 @@ jest.mock('@/external/bot-skeleton/services/api/api-base', () => ({
 
 jest.mock('@deriv-com/translations', () => ({
     Localize: ({ i18n_default_text }: { i18n_default_text: string }) => <span>{i18n_default_text}</span>,
+    localize: (text: string) => text,
 }));
 
 jest.mock('@/components/shared', () => ({
@@ -85,9 +86,8 @@ describe('AccountSwitcher', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it('renders active account type and balance', () => {
+    it('renders the balance and currency on the account button', () => {
         render(<AccountSwitcher activeAccount={mockActiveAccount} />);
-        expect(screen.getByText('Real account')).toBeInTheDocument();
         expect(screen.getByTestId('dt_balance')).toHaveTextContent('100.00 USD');
     });
 
@@ -115,7 +115,7 @@ describe('AccountSwitcher', () => {
         expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     });
 
-    it('does not open dropdown with a single account', () => {
+    it('opens the account panel even when there is only one account', () => {
         const { useApiBase } = require('@/hooks/useApiBase');
         useApiBase.mockReturnValue({
             accountList: [{ loginid: 'CR123', currency: 'USD', balance: 100, is_virtual: 0 }],
@@ -123,7 +123,7 @@ describe('AccountSwitcher', () => {
         });
         render(<AccountSwitcher activeAccount={mockActiveAccount} />);
         fireEvent.click(screen.getByTestId('dt_acc_info'));
-        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
     });
 
     it('closes dropdown on outside click', () => {
@@ -146,6 +146,7 @@ describe('AccountSwitcher', () => {
         const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
         render(<AccountSwitcher activeAccount={mockActiveAccount} />);
         fireEvent.click(screen.getByTestId('dt_acc_info'));
+        fireEvent.click(screen.getByRole('tab', { name: 'Demo' }));
         const options = screen.getAllByRole('option');
         const inactiveOption = options.find(o => o.getAttribute('aria-selected') === 'false');
         if (inactiveOption) fireEvent.click(inactiveOption);

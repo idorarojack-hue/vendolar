@@ -6,8 +6,21 @@
     height: 100vh;
 
     .deriv-header {
-        background: var(--general-main-1);
         height: 5.6rem;
+        padding: 0 1.6rem;
+        border-bottom: 1px solid rgb(255 145 54 / 16%);
+        background: var(--vd-bar);
+        box-shadow: none;
+        color: var(--vd-text);
+
+        .deriv-wrapper__left {
+            align-items: center;
+        }
+
+        --text-prominent: var(--vd-text);
+        --text-general: var(--vd-text);
+        --general-main-1: var(--vd-bar);
+        --general-section-1: rgb(255 255 255 / 12%);
     }
 
     &.quick-strategy-active {

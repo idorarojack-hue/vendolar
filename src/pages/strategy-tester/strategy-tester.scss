@@ -1,0 +1,103 @@
+.vd-tester {
+    &__verdict {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 1.4rem 1.6rem;
+        border-radius: 1rem;
+        background: var(--general-section-1);
+
+        strong {
+            color: var(--text-prominent);
+            font-size: 3.2rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        p {
+            color: var(--text-general);
+            font-size: 1.3rem;
+            line-height: 1.5;
+        }
+
+        &--bad {
+            background: rgb(240 106 80 / 10%);
+
+            strong {
+                color: var(--vd-down);
+            }
+        }
+
+        &--good {
+            background: rgb(255 145 54 / 12%);
+
+            strong {
+                color: var(--vd-orange-text);
+            }
+        }
+    }
+
+    &__winrate {
+        display: grid;
+        gap: 0.6rem;
+    }
+
+    &__winrate-labels {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.8rem;
+        color: var(--text-general);
+        font-size: 1.3rem;
+    }
+
+    &__bar {
+        position: relative;
+        height: 1.2rem;
+        border-radius: 10rem;
+        background: var(--general-section-1);
+    }
+
+    &__bar-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        border-radius: 10rem;
+        background: var(--vd-orange);
+    }
+
+    &__bar-mark {
+        position: absolute;
+        top: -0.4rem;
+        bottom: -0.4rem;
+        width: 0.3rem;
+        border-radius: 0.2rem;
+        background: #f59e0b;
+        transform: translateX(-50%);
+    }
+
+    &__stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    &__curve {
+        width: 100%;
+        height: 18rem;
+        border-radius: 0.8rem;
+        background: var(--general-section-1);
+    }
+
+    &__zero {
+        stroke: var(--border-normal);
+        stroke-dasharray: 4 4;
+    }
+
+    &__line {
+        fill: none;
+        stroke: var(--vd-orange);
+        stroke-width: 2;
+
+        &.is-down {
+            stroke: var(--vd-down);
+        }
+    }
+}

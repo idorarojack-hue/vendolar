@@ -8,7 +8,13 @@ const LogoutFooter = observer(() => {
     const handleLogout = useLogout();
 
     return (
-        <Tooltip as='button' className='app-footer__icon' onClick={handleLogout} tooltipContent={localize('Log out')}>
+        <Tooltip
+            as='button'
+            className='app-footer__icon'
+            onClick={handleLogout}
+            aria-label={localize('Log out')}
+            tooltipContent={localize('Log out')}
+        >
             <LegacyLogout1pxIcon iconSize='xs' fill='var(--text-general)' />
         </Tooltip>
     );

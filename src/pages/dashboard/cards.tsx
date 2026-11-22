@@ -25,6 +25,8 @@ import DashboardBotList from './bot-list/dashboard-bot-list';
 type TCardProps = {
     has_dashboard_strategies: boolean;
     is_mobile: boolean;
+    /** When false, only the saved-bot list and the load dialogs render (the dashboard hero has its own cards). */
+    show_tiles?: boolean;
 };
 
 type TCardArray = {
@@ -34,7 +36,7 @@ type TCardArray = {
     callback: () => void;
 };
 
-const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => {
+const Cards = observer(({ is_mobile, has_dashboard_strategies, show_tiles = true }: TCardProps) => {
     const { dashboard, load_modal, quick_strategy } = useStore();
     const { toggleLoadModal, setActiveTabIndex } = load_modal;
     const { isDesktop } = useDevice();
@@ -112,10 +114,11 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                 <div
                     className={classNames('tab__dashboard__table__tiles', {
                         'tab__dashboard__table__tiles--minimized': has_dashboard_strategies && is_mobile,
+                        'tab__dashboard__table__tiles--hidden': !show_tiles,
                     })}
-                    id='tab__dashboard__table__tiles'
+                    id={show_tiles ? 'tab__dashboard__table__tiles' : undefined}
                 >
-                    {actions.map(icons => {
+                    {show_tiles && actions.map(icons => {
                         const { icon, content, callback, id } = icons;
                         return (
                             <div
@@ -177,7 +180,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
             </div>
         ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [is_dialog_open, has_dashboard_strategies]
+        [is_dialog_open, has_dashboard_strategies, show_tiles]
     );
 });
 

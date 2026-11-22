@@ -174,7 +174,7 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
                         icon='info'
                         className='qs__tooltip'
                     />
-                    <div style={{ opacity: 0.5, marginLeft: '8px' }}>
+                    <div style={{ marginLeft: '8px' }}>
                         <Button
                             is_disabled={true}
                             className={button_props.class}

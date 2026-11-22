@@ -5,6 +5,7 @@ import { toMoment } from '@/components/shared';
 import { FORM_ERROR_MESSAGES } from '@/components/shared/constants/form-error-messages';
 import { initFormErrorMessages } from '@/components/shared/utils/validation/declarative-validation-rules';
 import { api_base } from '@/external/bot-skeleton';
+import { publishLiveBalance } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useLogout } from '@/hooks/useLogout';
 import { useStore } from '@/hooks/useStore';
@@ -118,8 +119,20 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
         // Changed parameter type from Record<string, unknown> to unknown to match onMessage signature
         async (res: unknown) => {
             if (!res) return;
-            const data = (res as Record<string, unknown>).data as TSocketResponseData<'balance'>;
+            const data = ((res as { data?: TSocketResponseData<'balance'> }).data ??
+                res) as TSocketResponseData<'balance'>;
             const { msg_type, error } = data;
+
+            const asAmount = (value: unknown) => {
+                const amount = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : NaN;
+                return Number.isFinite(amount) ? amount : null;
+            };
+            const applyLiveBalance = (amount: number | null, loginid?: string) => {
+                if (amount === null || !client) return;
+                const id = loginid || localStorage.getItem('active_loginid') || client.loginid;
+                client.setBalance(String(amount));
+                if (id) publishLiveBalance(id, amount);
+            };
 
             // Handle auth errors by calling client.logout() directly instead of useLogout hook
             // This prevents redundant logout operations since useLogout internally calls client.logout()
@@ -134,14 +147,22 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
                 await client?.logout();
             }
 
-            if (msg_type === 'balance' && data && !error) {
-                const balance = data.balance;
-                if (balance && typeof balance.balance === 'number') {
-                    client.setBalance(balance.balance.toString());
-
-                    if (balance.currency) {
-                        client.setCurrency(balance.currency);
-                    }
+            if (!error && data) {
+                const message = data as {
+                    balance?: { balance?: unknown; currency?: string; loginid?: string };
+                    transaction?: { balance?: unknown; loginid?: string };
+                    buy?: { balance_after?: unknown };
+                    sell?: { balance_after?: unknown };
+                };
+                if (msg_type === 'balance') {
+                    applyLiveBalance(asAmount(message.balance?.balance), message.balance?.loginid);
+                    if (message.balance?.currency) client.setCurrency(message.balance.currency);
+                } else if (msg_type === 'transaction') {
+                    applyLiveBalance(asAmount(message.transaction?.balance), message.transaction?.loginid);
+                } else if (msg_type === 'buy') {
+                    applyLiveBalance(asAmount(message.buy?.balance_after));
+                } else if (msg_type === 'sell') {
+                    applyLiveBalance(asAmount(message.sell?.balance_after));
                 }
             }
         },
