@@ -982,3 +982,30 @@ $vd-nav-bg-end: var(--vd-nav);
         transition: padding 0.25s ease;
     }
 }
+
+// Pages built without the .vd-page wrapper (DCircles, Auto Trading, Manual Trader, Signal AI) scroll
+// inside the tab like .vd-page does; the tab shell itself clips overflow on desktop.
+.dc-tabs__content--main__tabs {
+    > .vd-dcx,
+    > .vd-at,
+    > .vd-mt,
+    > .vd-sig {
+        @include desktop-screen {
+            height: calc(100vh - 17rem);
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+    }
+}
+
+// Phones and tablets: the tab area is the page's scroll container (nothing else scrolls, because
+// .main clips overflow). The Tutorials tab opts out with .no-scroll.
+.main .main__container:not(.no-scroll) {
+    @include mobile-or-tablet-screen {
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+}
