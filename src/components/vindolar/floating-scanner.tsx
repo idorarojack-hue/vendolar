@@ -17,6 +17,9 @@ import '../../pages/strategy-tester/strategy-tester.scss';
 
 const WINDOW = 100;
 
+/** Dispatch on `document` to open the scanner panel from anywhere. */
+export const OPEN_SCANNER_EVENT = 'vd:open-scanner';
+
 type TTone = 'up' | 'down';
 
 type TRow = { market: TMarketSymbol; unusual: TUnusualness; streak: string; streak_tone: TTone; last: number[] };
@@ -152,6 +155,16 @@ const FloatingScanner = observer(({ lifted, beside_drawer }: { lifted: boolean; 
     const panel_ref = React.useRef<HTMLDivElement>(null);
 
     const onUpdate = React.useCallback((row: TRow) => setRows(previous => ({ ...previous, [row.market.symbol]: row })), []);
+
+    // Other pages (e.g. Bulk Trader's "Market scanner" button) open the panel with this event.
+    React.useEffect(() => {
+        const onOpen = () => {
+            setView('markets');
+            setOpen(true);
+        };
+        document.addEventListener(OPEN_SCANNER_EVENT, onOpen);
+        return () => document.removeEventListener(OPEN_SCANNER_EVENT, onOpen);
+    }, [setView]);
 
     React.useEffect(() => {
         if (!open) return undefined;

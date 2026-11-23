@@ -24,7 +24,7 @@ const CONTRACT_NAMES: Record<string, string> = {
 export const contractName = (contract_type: string, digit?: number) =>
     `${localize(CONTRACT_NAMES[contract_type] ?? contract_type)}${digit !== undefined ? ` ${digit}` : ''}`;
 
-const STATUS_TEXT: Record<TSessionState['status'], string> = {
+export const STATUS_TEXT: Record<TSessionState['status'], string> = {
     idle: 'Ready',
     waiting: 'Watching for an entry…',
     buying: 'Placing trade…',

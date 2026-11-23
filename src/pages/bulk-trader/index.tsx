@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
-import AutoSession from '@/components/vindolar/auto-session';
+import { OPEN_SCANNER_EVENT } from '@/components/vindolar/floating-scanner';
 import NumberField from '@/components/vindolar/number-field';
 import { MarketSelect, validDigit } from '@/components/vindolar/pickers';
 import { useAutoTrader } from '@/hooks/useAutoTrader';
@@ -11,24 +11,41 @@ import { usePositions } from '@/hooks/usePositions';
 import { useProposal } from '@/hooks/useProposal';
 import { useStore } from '@/hooks/useStore';
 import { TContractParams } from '@/services/vindolar/contracts';
-import { computeDigitStats } from '@/services/vindolar/digit-stats';
+import { computeDigitStats, TTick } from '@/services/vindolar/digit-stats';
 import { createRuleStrategy, TCondition } from '@/services/vindolar/rules';
-import ToolHero, { PageBackdrop } from '@/components/vindolar/tool-hero';
 import { localize } from '@deriv-com/translations';
-import { DigitRings, LastDigits } from '../analysis-tools/components';
+import { DigitRings } from '../analysis-tools/components';
 import Positions from '../manual-trader/positions';
+import AutoWorkspace from './auto-workspace';
 import '../manual-trader/manual-trader.scss';
+import './bulk-trader.scss';
 
 const ID = 'bulk-trader';
+const PATTERN_LENGTH = 8;
 
 type TPair = 'even_odd' | 'over_under' | 'rise_fall' | 'matches_differs';
 
-const PAIRS: { id: TPair; label: string; sides: [string, string]; names: [string, string] }[] = [
-    { id: 'even_odd', label: 'Even/Odd', sides: ['DIGITEVEN', 'DIGITODD'], names: ['Even', 'Odd'] },
-    { id: 'over_under', label: 'Over/Under', sides: ['DIGITOVER', 'DIGITUNDER'], names: ['Over', 'Under'] },
-    { id: 'rise_fall', label: 'Rise/Fall', sides: ['CALL', 'PUT'], names: ['Rise', 'Fall'] },
-    { id: 'matches_differs', label: 'Matches/Differs', sides: ['DIGITMATCH', 'DIGITDIFF'], names: ['Matches', 'Differs'] },
+const PAIRS: { id: TPair; label: string; sides: [string, string]; names: [string, string]; letters: [string, string] }[] = [
+    { id: 'even_odd', label: 'Even/Odd', sides: ['DIGITEVEN', 'DIGITODD'], names: ['Even', 'Odd'], letters: ['E', 'O'] },
+    { id: 'over_under', label: 'Over/Under', sides: ['DIGITOVER', 'DIGITUNDER'], names: ['Over', 'Under'], letters: ['O', 'U'] },
+    { id: 'rise_fall', label: 'Rise/Fall', sides: ['CALL', 'PUT'], names: ['Rise', 'Fall'], letters: ['R', 'F'] },
+    { id: 'matches_differs', label: 'Matches/Differs', sides: ['DIGITMATCH', 'DIGITDIFF'], names: ['Matches', 'Differs'], letters: ['M', 'D'] },
 ];
+
+/** Which side (0 = left, 1 = right, null = neither) a tick landed on for this trade type. */
+const sideOf = (pair: TPair, tick: TTick, previous: TTick | undefined, digit: number): 0 | 1 | null => {
+    switch (pair) {
+        case 'even_odd':
+            return tick.digit % 2 === 0 ? 0 : 1;
+        case 'over_under':
+            return tick.digit > digit ? 0 : tick.digit < digit ? 1 : null;
+        case 'rise_fall':
+            if (!previous || tick.quote === previous.quote) return null;
+            return tick.quote > previous.quote ? 0 : 1;
+        default:
+            return tick.digit === digit ? 0 : 1;
+    }
+};
 
 const BulkTrader = observer(() => {
     const { client } = useStore();
@@ -83,12 +100,17 @@ const BulkTrader = observer(() => {
         }
     };
 
+    const pattern = ticks.slice(-PATTERN_LENGTH).map((tick, i, recent) => {
+        const index = ticks.length - recent.length + i;
+        return { tick, side: sideOf(pair.id, tick, ticks[index - 1], digit) };
+    });
+
     const placeOrder = (contract_type: string) => {
         if (is_real && !real_ok) return;
         buy(Array.from({ length: copies }, () => ({ params: params(contract_type), market_name: market?.name ?? symbol })));
     };
 
-    // Auto mode: after N digits all on one side, trade the opposite (or same) side.
+    // Auto mode: after N results all on one side, trade the opposite (or same) side.
     const buildStrategy = () => {
         let condition: TCondition;
         let trade_type: string;
@@ -126,156 +148,147 @@ const BulkTrader = observer(() => {
     const disabled_buy = !client.is_logged_in || is_buying || (is_real && !real_ok);
 
     return (
-        <div className='vd-page vd-page--dark vd-bulk'>
-            <PageBackdrop />
-            <ToolHero
-                eyebrow={localize('Vindolar · Trade')}
-                title={localize('Bulk Trader')}
-                subtitle={localize('Digit statistics for one market, with one-click and multi-contract orders.')}
-                right={
-                <div className='vd-detail__price' style={{ alignItems: 'flex-end' }}>
-                    <span className='vd-field__label'>{localize('Current tick')}</span>
-                    <strong className='vd-bulk__quote'>{latest && market ? latest.quote.toFixed(market.pip_size) : '—'}</strong>
-                </div>
-                }
-            />
+        <div className='vd-page vd-bt'>
+            <div className='vd-bt__selects'>
+                <MarketSelect value={symbol} onChange={setSymbol} disabled={is_running} />
+                <label className='vd-number'>
+                    <span className='vd-field__label'>{localize('Trade type')}</span>
+                    <select className='vd-select' value={pair_id} onChange={e => setPairId(e.target.value as TPair)} disabled={is_running}>
+                        {PAIRS.map(p => (
+                            <option key={p.id} value={p.id}>
+                                {localize(p.label)}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+            </div>
 
-            <div className='vd-bulk__board'>
-                <div className='vd-card vd-bulk__col vd-bulk__market'>
-                    <header className='vd-bulk__market-head'>
-                        <span>{localize('Watching')}</span>
-                        <strong>{market?.name ?? symbol}</strong>
-                    </header>
-                    <div className='vd-bulk__controls'>
-                        <MarketSelect value={symbol} onChange={setSymbol} disabled={is_running} />
+            <div className={classNames('vd-bt__window', { 'vd-bt__window--digit': has_digit })}>
+                <NumberField label={localize('Number of ticks')} value={window} min={20} max={1000} decimals={0} onChange={setWindow} />
+                {has_digit && (
+                    <label className='vd-number'>
+                        <span className='vd-field__label'>{localize('Digit')}</span>
+                        <select className='vd-select' value={digit} onChange={e => setDigit(Number(e.target.value))} disabled={is_running}>
+                            {Array.from({ length: 10 }, (_, d) => (
+                                <option key={d} value={d}>
+                                    {d}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                )}
+            </div>
+
+            <div className='vd-bt__tick-row'>
+                <div className='vd-bt__tick'>
+                    <span>{localize('Current tick')}</span>
+                    <strong>{latest && market ? latest.quote.toFixed(market.pip_size) : '—'}</strong>
+                </div>
+                <button type='button' className='vd-bt__scanner' onClick={() => document.dispatchEvent(new Event(OPEN_SCANNER_EVENT))}>
+                    <svg viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='currentColor' strokeWidth='1.8' aria-hidden='true'>
+                        <path d='M12 3 3 7.5l9 4.5 9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5 12 21l9-4.5' strokeLinejoin='round' />
+                    </svg>
+                    {localize('Market scanner')}
+                </button>
+            </div>
+
+            <section className='vd-bt__digits' aria-label={localize('How often each digit appeared')}>
+                <DigitRings stats={stats} current_digit={latest?.digit} size={76} />
+                <div className='vd-bt__pattern' aria-label={localize('Last {{n}} results', { n: pattern.length })}>
+                    {pattern.map(({ tick, side }, i) => (
+                        <span
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={i}
+                            className={classNames('vd-bt__pattern-chip', side === null ? 'is-flat' : side === 0 ? 'is-left' : 'is-right')}
+                            title={`${localize('Digit')} ${tick.digit}`}
+                        >
+                            {side === null ? '=' : pair.letters[side]}
+                        </span>
+                    ))}
+                </div>
+            </section>
+
+            <div className='vd-bt__order'>
+                <NumberField label={localize('Ticks')} value={duration} min={1} max={10} decimals={0} disabled={is_running} onChange={setDuration} />
+                <NumberField label={localize('Stake')} value={stake} min={0.35} onChange={setStake} />
+                <NumberField
+                    label={localize('Contracts per order')}
+                    value={copies}
+                    min={1}
+                    max={10}
+                    decimals={0}
+                    onChange={setCopies}
+                    hint={copies > 1 ? localize('Total per click: {{total}} {{currency}}. They settle on the same tick.', { total: (stake * copies).toFixed(2), currency }) : undefined}
+                />
+            </div>
+
+            {is_real && (
+                <label className='vd-real-confirm'>
+                    <input type='checkbox' checked={real_ok} onChange={e => setRealOk(e.target.checked)} />
+                    <span>{localize('I understand these trades use real money.')}</span>
+                </label>
+            )}
+
+            <div className='vd-bt__sides'>
+                {[left, right].map((proposal, i) => {
+                    const side = i as 0 | 1;
+                    const contract_type = pair.sides[side];
+                    const pct = share(side);
+                    return (
+                        <div className='vd-bt__side-wrap' key={contract_type}>
+                            <button
+                                type='button'
+                                className={classNames('vd-bt-side', side === 0 ? 'vd-bt-side--left' : 'vd-bt-side--right')}
+                                disabled={disabled_buy || Boolean(proposal.error) || proposal.is_loading}
+                                onClick={() => placeOrder(contract_type)}
+                            >
+                                <span className='vd-bt-side__fill' style={{ width: `${Math.min(Math.max(pct, 0), 100)}%` }} aria-hidden='true' />
+                                <span className='vd-bt-side__top'>
+                                    <span className='vd-bt-side__name'>
+                                        <span className='vd-bt-side__icon' aria-hidden='true' />
+                                        {localize(pair.names[side])}
+                                        {has_digit ? ` ${validDigit(contract_type, digit)}` : ''}
+                                        {copies > 1 ? ` ×${copies}` : ''}
+                                    </span>
+                                    <span className='vd-bt-side__payout'>
+                                        {proposal.is_loading ? '…' : `${currency} ${proposal.payout?.toFixed(2) ?? '—'}`}
+                                    </span>
+                                </span>
+                                <span className='vd-bt-side__pct'>{pct.toFixed(2)}%</span>
+                            </button>
+                            {proposal.error && <p className='vd-buy__error'>{proposal.error}</p>}
+                        </div>
+                    );
+                })}
+            </div>
+            {!client.is_logged_in && <p className='vd-trade-panel__notice'>{localize('Log in to place trades. Prices are live.')}</p>}
+            {error && (
+                <p role='alert' className='vd-message vd-message--error'>
+                    {error}
+                </p>
+            )}
+            {positions.length > 0 && <Positions positions={positions} currency={currency} onSell={sell} />}
+
+            <AutoWorkspace
+                id={ID}
+                buildStrategy={buildStrategy}
+                subtitle={localize('{{pair}} - Pattern-based execution', { pair: localize(pair.label) })}
+                controls={
+                    <>
+                        <NumberField label={localize('Run length')} value={auto_count} min={1} max={10} decimals={0} disabled={is_running} onChange={setAutoCount} />
                         <label className='vd-number'>
-                            <span className='vd-field__label'>{localize('Trade type')}</span>
-                            <select className='vd-select' value={pair_id} onChange={e => setPairId(e.target.value as TPair)} disabled={is_running}>
-                                {PAIRS.map(p => (
-                                    <option key={p.id} value={p.id}>
-                                        {localize(p.label)}
-                                    </option>
-                                ))}
+                            <span className='vd-field__label'>{localize('Then trade')}</span>
+                            <select className='vd-select' value={auto_follow} disabled={is_running} onChange={e => setAutoFollow(e.target.value as 'opposite' | 'same')}>
+                                <option value='opposite'>{localize('The opposite side')}</option>
+                                <option value='same'>{localize('The same side')}</option>
                             </select>
                         </label>
-                        <NumberField label={localize('Window (ticks)')} value={window} min={20} max={1000} decimals={0} onChange={setWindow} />
-                        {has_digit && (
-                            <label className='vd-number vd-bulk__digit'>
-                                <span className='vd-field__label'>{localize('Digit')}</span>
-                                <select className='vd-select' value={digit} onChange={e => setDigit(Number(e.target.value))} disabled={is_running}>
-                                    {Array.from({ length: 10 }, (_, d) => (
-                                        <option key={d} value={d}>
-                                            {d}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                        )}
-                    </div>
-
-                    <section className='vd-bulk__digits' aria-label={localize('Digit share')}>
-                        <span className='vd-field__label'>{localize('How often each digit appeared')}</span>
-                        <div className='vd-digits-wide'>
-                            <DigitRings stats={stats} current_digit={latest?.digit} size={52} />
-                        </div>
-                    </section>
-
-                    <section className='vd-bulk__tape' aria-label={localize('Recent digits')}>
-                        <span className='vd-field__label'>{localize('Recent digits')}</span>
-                        <LastDigits digits={ticks.slice(-24).map(t => t.digit)} barrier={digit} />
-                    </section>
-                </div>
-
-                <div className='vd-bulk__stack'>
-                    <div className='vd-card'>
-                        <div className='vd-row'>
-                            <NumberField label={localize('Duration (ticks)')} value={duration} min={1} max={10} decimals={0} disabled={is_running} onChange={setDuration} />
-                            <NumberField label={localize('Stake per contract')} unit={currency} value={stake} min={0.35} onChange={setStake} />
-                            <NumberField
-                                label={localize('Contracts per order')}
-                                value={copies}
-                                min={1}
-                                max={10}
-                                decimals={0}
-                                onChange={setCopies}
-                                hint={localize(
-                                    'Total per click: {{total}} {{currency}}. Contracts in one order settle on the same tick, so they win or lose together.',
-                                    { total: (stake * copies).toFixed(2), currency }
-                                )}
-                            />
-                        </div>
-
-                        {is_real && (
-                            <label className='vd-real-confirm'>
-                                <input type='checkbox' checked={real_ok} onChange={e => setRealOk(e.target.checked)} />
-                                <span>{localize('I understand these trades use real money.')}</span>
-                            </label>
-                        )}
-
-                        <div className='vd-trade-panel__buy'>
-                            {[left, right].map((proposal, i) => {
-                                const side = i as 0 | 1;
-                                const contract_type = pair.sides[side];
-                                return (
-                                    <div className='vd-buy' key={contract_type}>
-                                        <button
-                                            type='button'
-                                            className={classNames('vd-buy__button', side === 0 ? 'vd-buy__button--up' : 'vd-buy__button--down')}
-                                            disabled={disabled_buy || Boolean(proposal.error) || proposal.is_loading}
-                                            onClick={() => placeOrder(contract_type)}
-                                        >
-                                            <span className='vd-buy__label'>
-                                                {localize(pair.names[side])}
-                                                {has_digit ? ` ${validDigit(contract_type, digit)}` : ''}
-                                                {copies > 1 ? ` ×${copies}` : ''}
-                                            </span>
-                                            <span className='vd-buy__payout'>
-                                                {proposal.is_loading ? '…' : `${proposal.payout?.toFixed(2) ?? '—'} ${currency}`}
-                                                <small>
-                                                    {localize('{{share}}% of last {{n}} ticks', { share: share(side).toFixed(1), n: stats.sample })}
-                                                </small>
-                                            </span>
-                                        </button>
-                                        {proposal.error && <p className='vd-buy__error'>{proposal.error}</p>}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        {!client.is_logged_in && <p className='vd-trade-panel__notice'>{localize('Log in to place trades. Prices are live.')}</p>}
-                        {error && (
-                            <p role='alert' className='vd-message vd-message--error'>
-                                {error}
-                            </p>
-                        )}
-                    </div>
-                    <Positions positions={positions} currency={currency} onSell={sell} />
-                </div>
-
-                <div className='vd-card vd-bulk__col'>
-                    <h3 className='vd-card__title'>
-                        {localize('Auto trade')}
-                        <span className='vd-card__badge'>{localize('Pattern rule')}</span>
-                    </h3>
-                    <AutoSession id={ID} buildStrategy={buildStrategy} compact start_label={localize('Start auto trade')}>
-                        <div className='vd-row'>
-                            <NumberField label={localize('Run length')} value={auto_count} min={1} max={10} decimals={0} disabled={is_running} onChange={setAutoCount} />
-                            <label className='vd-number'>
-                                <span className='vd-field__label'>{localize('Then trade')}</span>
-                                <select className='vd-select' value={auto_follow} disabled={is_running} onChange={e => setAutoFollow(e.target.value as 'opposite' | 'same')}>
-                                    <option value='opposite'>{localize('The opposite side')}</option>
-                                    <option value='same'>{localize('The same side')}</option>
-                                </select>
-                            </label>
-                        </div>
-                        <p className='vd-card__text'>
-                            {auto_description}{' '}
-                            {is_running
-                                ? localize('Market, trade type, digit and duration above are locked while auto trade runs.')
-                                : localize('Uses the market, trade type, digit and duration above.')}
+                        <p className='vd-bt-auto__rule'>
+                            {auto_description} {localize('Uses the market, trade type, digit and ticks above.')}
                         </p>
-                    </AutoSession>
-                </div>
-            </div>
+                    </>
+                }
+            />
         </div>
     );
 });
