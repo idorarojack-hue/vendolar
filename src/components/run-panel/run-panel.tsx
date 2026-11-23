@@ -11,12 +11,14 @@ import Text from '@/components/shared_ui/text';
 import Summary from '@/components/summary';
 import TradeAnimation from '@/components/trade-animation';
 import Transactions from '@/components/transactions';
-import { DBOT_TABS } from '@/constants/bot-contents';
 import { popover_zindex } from '@/constants/z-indexes';
+import { observer as globalObserver } from '@/external/bot-skeleton/utils/observer';
 import { useStore } from '@/hooks/useStore';
+import { TOOL_CONTRACT_EVENT } from '@/services/vindolar/trading';
 import { Localize, localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import ThemedScrollbars from '../shared_ui/themed-scrollbars';
+import { TContractInfo } from '../summary/summary-card.types';
 
 type TStatisticsTile = {
     content: React.ElementType | string;
@@ -246,7 +248,7 @@ const StatisticsInfoModal = ({
     );
 };
 
-const RunPanel = observer(() => {
+const RunPanel = observer(({ hide_run_controls = false }: { hide_run_controls?: boolean }) => {
     const { run_panel, dashboard, transactions } = useStore();
     const { client } = useStore();
     const { isDesktop } = useDevice();
@@ -265,14 +267,21 @@ const RunPanel = observer(() => {
         toggleStatisticsInfoModal,
     } = run_panel;
     const { statistics } = transactions;
-    const { active_tour, active_tab } = dashboard;
+    const { active_tour } = dashboard;
     const { total_payout, total_profit, total_stake, won_contracts, lost_contracts, number_of_runs } = statistics;
-    const { BOT_BUILDER, CHART } = DBOT_TABS;
 
     React.useEffect(() => {
         onMount();
         return () => onUnmount();
     }, [onMount, onUnmount]);
+
+    // Trades placed from the tool tabs (Manual Trader, Bulk Trader, ...) are listed here as well,
+    // so the panel's Reset clears them together with the bot's trades.
+    React.useEffect(() => {
+        const onToolContract = (contract: TContractInfo) => transactions.onBotContractEvent(contract);
+        globalObserver.register(TOOL_CONTRACT_EVENT, onToolContract);
+        return () => globalObserver.unregister(TOOL_CONTRACT_EVENT, onToolContract);
+    }, [transactions]);
 
     React.useEffect(() => {
         if (!isDesktop) {
@@ -310,8 +319,8 @@ const RunPanel = observer(() => {
         />
     );
 
-    const show_run_panel = [BOT_BUILDER, CHART].includes(active_tab) || active_tour;
-    if ((!show_run_panel && isDesktop) || active_tour === 'bot_builder') return null;
+    // Shown on every tab; the Run controls under it (mobile) only where the Bot Builder bot is relevant.
+    if (active_tour === 'bot_builder') return null;
 
     return (
         <>
@@ -332,7 +341,7 @@ const RunPanel = observer(() => {
                 >
                     {content}
                 </Drawer>
-                {!isDesktop && <MobileDrawerFooter />}
+                {!isDesktop && !hide_run_controls && <MobileDrawerFooter />}
             </div>
 
             <StatisticsInfoModal

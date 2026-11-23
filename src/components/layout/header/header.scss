@@ -4,7 +4,7 @@
 .app-header {
     background: var(--vd-bg);
     color: var(--vd-text);
-    border-bottom: 1px solid rgb(255 145 54 / 16%);
+    border-bottom: 1px solid rgb(var(--vd-accent-rgb) / 16%);
 
     &__account-settings {
         padding-inline-end: 1.2rem;
@@ -268,7 +268,7 @@
     .vd-header-login {
         border: 1px solid var(--vd-border-soft);
         background: transparent;
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-header-start,
@@ -325,7 +325,6 @@
         color: var(--text-prominent);
         animation: auth-spinner-rotate 0.8s linear infinite;
     }
-
 }
 
 .deriv-accordion--underline {
@@ -333,8 +332,12 @@
 }
 
 @keyframes auth-spinner-rotate {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 // Phones, logged in: menu + logo + balance + Transfer must fit a 360px screen

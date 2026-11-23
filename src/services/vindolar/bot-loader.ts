@@ -49,7 +49,11 @@ type TQuickStrategyStore = {
 export class BotLoadError extends Error {}
 
 /** Load a bot into the Bot Builder. Rejects with a readable message if the builder isn't ready. */
-export const loadBot = async (quick_strategy: TQuickStrategyStore, config: TBotConfig, action: 'LOAD' | 'RUN' = 'LOAD') => {
+export const loadBot = async (
+    quick_strategy: TQuickStrategyStore,
+    config: TBotConfig,
+    action: 'LOAD' | 'RUN' = 'LOAD'
+) => {
     // api-helpers.js is untyped; `instance` is set once the Bot Builder has started.
     const helpers = (ApiHelpers as unknown as { instance?: { contracts_for?: unknown } }).instance;
     if (!helpers?.contracts_for || !(window as any).Blockly?.derivWorkspace) {

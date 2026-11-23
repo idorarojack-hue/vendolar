@@ -1,4 +1,11 @@
-import { computeDigitStats, getCurrentStreak, getLastDigit, mostUnusual, sortVolatilitySymbols, TTick } from '../digit-stats';
+import {
+    computeDigitStats,
+    getCurrentStreak,
+    getLastDigit,
+    mostUnusual,
+    sortVolatilitySymbols,
+    TTick,
+} from '../digit-stats';
 
 describe('getCurrentStreak', () => {
     it('measures the run at the end', () => {

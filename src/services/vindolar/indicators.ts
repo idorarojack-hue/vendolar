@@ -65,7 +65,8 @@ export const PRICE_STRATEGIES: TPriceStrategyDefinition[] = [
     {
         id: 'trend-rider',
         name: 'Trend Rider',
-        description: 'Trades with the trend: fast average above slow average and price above both → Rise (and the mirror for Fall).',
+        description:
+            'Trades with the trend: fast average above slow average and price above both → Rise (and the mirror for Fall).',
         tags: ['EMA 10/30', 'Trend'],
         history: 40,
         signal: q => {

@@ -1,14 +1,15 @@
 import classNames from 'classnames';
 import AutoSession from '@/components/vindolar/auto-session';
+import { LiveDigitCircles } from '@/components/vindolar/digit-circles';
 import NumberField from '@/components/vindolar/number-field';
 import { MarketSelect } from '@/components/vindolar/pickers';
+import { PageBackdrop } from '@/components/vindolar/tool-hero';
 import { useAutoTrader } from '@/hooks/useAutoTrader';
 import { useTicks, useVolatilitySymbols } from '@/hooks/useMarketData';
 import { usePersistentState } from '@/hooks/usePersistentState';
-import { TMarketSymbol } from '@/services/vindolar/market-data';
 import { getCurrentStreak } from '@/services/vindolar/digit-stats';
 import { createDigitStrategy, parityRule, rangeBounceRule } from '@/services/vindolar/digit-strategies';
-import { PageBackdrop } from '@/components/vindolar/tool-hero';
+import { TMarketSymbol } from '@/services/vindolar/market-data';
 import { localize } from '@deriv-com/translations';
 import './recovery-trader.scss';
 
@@ -89,6 +90,8 @@ const RecoveryTrader = () => {
                             'Each digit is random, so waiting for a run does not improve the odds. With martingale on, losses grow quickly — the max stake and stop loss below are your protection.'
                         )}
                     </p>
+
+                    {market !== 'ALL' && <LiveDigitCircles symbol={market} />}
 
                     <h3>
                         {localize('Live scan')} <small>{localize('needs {{n}} in a row', { n: needed })}</small>

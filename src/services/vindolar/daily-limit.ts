@@ -66,4 +66,5 @@ export const wouldBreachDailyLimit = (stake: number) => {
     return Math.round((loss_so_far + stake) * 100) / 100 > limit;
 };
 
-export const DAILY_LIMIT_MESSAGE = 'Daily loss limit reached — no more trades today. You can change the limit in Reports.';
+export const DAILY_LIMIT_MESSAGE =
+    'Daily loss limit reached — no more trades today. You can change the limit in Reports.';

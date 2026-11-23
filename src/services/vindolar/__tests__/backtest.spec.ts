@@ -10,14 +10,17 @@ const rng = (seed: number) => () => {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-const ticksFromDigits = (digits: number[]): TTick[] => digits.map((digit, i) => ({ epoch: i, quote: 100 + i * 0.01, digit }));
+const ticksFromDigits = (digits: number[]): TTick[] =>
+    digits.map((digit, i) => ({ epoch: i, quote: 100 + i * 0.01, digit }));
 
-const always = (contract_type: string, digit?: number): (() => TStrategy) => () => ({
-    name: 'always',
-    markets: ['R_100'],
-    history: 1,
-    decide: ({ symbol }) => ({ symbol, contract_type, digit, duration: 1 }),
-});
+const always =
+    (contract_type: string, digit?: number): (() => TStrategy) =>
+    () => ({
+        name: 'always',
+        markets: ['R_100'],
+        history: 1,
+        decide: ({ symbol }) => ({ symbol, contract_type, digit, duration: 1 }),
+    });
 
 const base = { stake: 1, take_profit: 1000, stop_loss: 1000, martingale: false, multiplier: 2, max_stake: 1000 };
 
@@ -42,7 +45,14 @@ describe('runBacktest', () => {
         // decisions at 0, 3, 6, 9 → exits at 2, 5, 8, 11 → digits 2 (win), 1 (loss), 4 (win), 3 (loss)
         const ticks = ticksFromDigits([0, 0, 2, 0, 0, 1, 0, 0, 4, 0, 0, 3]);
         const payouts = new Map([[payoutKey({ contract_type: 'DIGITEVEN', duration: 1 }), 1.9]]);
-        const r = runBacktest({ ticks, symbol: 'R_100', createStrategy: always('DIGITEVEN'), settings: base, payouts, warmup: 0 });
+        const r = runBacktest({
+            ticks,
+            symbol: 'R_100',
+            createStrategy: always('DIGITEVEN'),
+            settings: base,
+            payouts,
+            warmup: 0,
+        });
         expect(r.trades.map(t => t.won)).toEqual([true, false, true, false]);
         expect(r.net_profit).toBeCloseTo(0.9 - 1 + 0.9 - 1);
         expect(r.breakeven_win_rate).toBeCloseTo((1 / 1.9) * 100);
@@ -71,7 +81,14 @@ describe('runBacktest', () => {
         const random = rng(42);
         const ticks = ticksFromDigits(Array.from({ length: 40000 }, () => Math.floor(random() * 10)));
         const payouts = new Map([[payoutKey({ contract_type: 'DIGITEVEN', duration: 1 }), 1.92]]);
-        const r = runBacktest({ ticks, symbol: 'R_100', createStrategy: always('DIGITEVEN'), settings: base, payouts, warmup: 0 });
+        const r = runBacktest({
+            ticks,
+            symbol: 'R_100',
+            createStrategy: always('DIGITEVEN'),
+            settings: base,
+            payouts,
+            warmup: 0,
+        });
         // Expected return: 0.5 × 1.92 − 1 = −4% of everything staked.
         expect(r.trades.length).toBe(13333); // one trade per 3 ticks (decide, entry, exit)
         expect(r.return_on_staked).toBeGreaterThan(-7);

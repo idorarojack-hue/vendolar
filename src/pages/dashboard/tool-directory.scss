@@ -22,7 +22,7 @@
 
     &__title {
         margin: 0;
-        color: #fff;
+        color: var(--vd-text);
         font-family: var(--vd-font-display);
         font-size: 2.2rem;
         font-weight: 700;
@@ -40,7 +40,7 @@
             border: 1px solid var(--vd-border);
             border-radius: 10rem;
             background: var(--vd-panel);
-            color: #fff;
+            color: var(--vd-text);
             font: inherit;
             font-size: 1.3rem;
             font-weight: 700;
@@ -135,7 +135,7 @@
         min-width: 0;
 
         strong {
-            color: #fff;
+            color: var(--vd-text);
             font-size: 1.6rem;
             font-weight: 700;
         }

@@ -3,14 +3,21 @@ import { TTick } from '@/services/vindolar/digit-stats';
 
 type TLine = { value: number; label: string; tone: 'entry' | 'barrier' };
 
+/** Accumulator range: shaded from the latest tick to the right edge, with ± distance labels. */
+export type TChartBand = { high: number; low: number; high_label?: string; low_label?: string };
+
 type TTickChartProps = {
     ticks: TTick[];
     pip_size: number;
     lines?: TLine[];
+    band?: TChartBand;
     height?: number;
+    /** Share of the plot width left empty on the right, so the latest tick isn't against the edge. */
+    lead_space?: number;
+    show_times?: boolean;
 };
 
-const PADDING = { top: 16, right: 76, bottom: 22, left: 8 };
+const PADDING = { top: 16, right: 76, bottom: 26, left: 8 };
 
 const useElementWidth = <T extends HTMLElement>() => {
     const ref = React.useRef<T>(null);
@@ -24,11 +31,21 @@ const useElementWidth = <T extends HTMLElement>() => {
     return [ref, width] as const;
 };
 
-/** Lightweight live line chart of recent ticks, with optional horizontal lines (entry spot, barriers). */
-const TickChart = ({ ticks, pip_size, lines = [], height = 300 }: TTickChartProps) => {
+const timeLabel = (epoch: number) => new Date(epoch * 1000).toTimeString().slice(0, 8);
+
+/** Lightweight live line chart of recent ticks, with optional lines (entry spot, barriers) and a barrier band. */
+const TickChart = ({
+    ticks,
+    pip_size,
+    lines = [],
+    band,
+    height = 300,
+    lead_space = 0,
+    show_times = false,
+}: TTickChartProps) => {
     const [ref, width] = useElementWidth<HTMLDivElement>();
 
-    const values = [...ticks.map(t => t.quote), ...lines.map(l => l.value)];
+    const values = [...ticks.map(t => t.quote), ...lines.map(l => l.value), ...(band ? [band.high, band.low] : [])];
     const has_data = ticks.length > 1 && width > 0;
     const min = Math.min(...values);
     const max = Math.max(...values);
@@ -37,8 +54,9 @@ const TickChart = ({ ticks, pip_size, lines = [], height = 300 }: TTickChartProp
     const high = max + range * 0.1;
 
     const plot_w = Math.max(width - PADDING.left - PADDING.right, 1);
+    const line_w = plot_w * (1 - lead_space);
     const plot_h = height - PADDING.top - PADDING.bottom;
-    const x = (i: number) => PADDING.left + (i / Math.max(ticks.length - 1, 1)) * plot_w;
+    const x = (i: number) => PADDING.left + (i / Math.max(ticks.length - 1, 1)) * line_w;
     const y = (v: number) => PADDING.top + (1 - (v - low) / (high - low)) * plot_h;
 
     const line_path = ticks.map((t, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(t.quote).toFixed(1)}`).join(' ');
@@ -46,7 +64,10 @@ const TickChart = ({ ticks, pip_size, lines = [], height = 300 }: TTickChartProp
         ? `${line_path} L${x(ticks.length - 1).toFixed(1)},${PADDING.top + plot_h} L${PADDING.left},${PADDING.top + plot_h} Z`
         : '';
     const last = ticks[ticks.length - 1];
-    const grid_values = [0, 1, 2, 3].map(i => low + ((high - low) * (i + 0.5)) / 4);
+    const grid_values = [0, 1, 2, 3, 4].map(i => low + ((high - low) * (i + 0.5)) / 5);
+    const time_marks =
+        show_times && ticks.length > 6 ? [0, 0.2, 0.4, 0.6, 0.8, 1].map(f => Math.round(f * (ticks.length - 1))) : [];
+    const right = PADDING.left + plot_w;
 
     return (
         <div ref={ref} className='vd-chart' style={{ height }}>
@@ -54,19 +75,65 @@ const TickChart = ({ ticks, pip_size, lines = [], height = 300 }: TTickChartProp
                 <svg width={width} height={height} role='img' aria-label={`Price ${last.quote.toFixed(pip_size)}`}>
                     {grid_values.map(v => (
                         <g key={v} className='vd-chart__grid'>
-                            <line x1={PADDING.left} x2={PADDING.left + plot_w} y1={y(v)} y2={y(v)} />
-                            <text x={PADDING.left + plot_w + 8} y={y(v) + 4}>
+                            <line x1={PADDING.left} x2={right} y1={y(v)} y2={y(v)} />
+                            <text x={right + 8} y={y(v) + 4}>
                                 {v.toFixed(pip_size)}
                             </text>
                         </g>
                     ))}
 
-                    <path d={area_path} fill='#ff9136' fillOpacity={0.1} />
+                    {time_marks.map(i => (
+                        <g key={i} className='vd-chart__grid'>
+                            <line x1={x(i)} x2={x(i)} y1={PADDING.top} y2={PADDING.top + plot_h} />
+                            <text
+                                x={x(i)}
+                                y={height - 6}
+                                textAnchor={i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle'}
+                            >
+                                {timeLabel(ticks[i].epoch)}
+                            </text>
+                        </g>
+                    ))}
+
+                    <path d={area_path} className='vd-chart__area' />
                     <path d={line_path} className='vd-chart__line' />
 
+                    {band && (
+                        <g className='vd-chart__band'>
+                            <rect
+                                x={x(ticks.length - 1)}
+                                y={y(band.high)}
+                                width={Math.max(right - x(ticks.length - 1), 0)}
+                                height={Math.max(y(band.low) - y(band.high), 0)}
+                            />
+                            <line x1={x(ticks.length - 1)} x2={right} y1={y(band.high)} y2={y(band.high)} />
+                            <line x1={x(ticks.length - 1)} x2={right} y1={y(band.low)} y2={y(band.low)} />
+                            <line
+                                className='vd-chart__band-mid'
+                                x1={x(ticks.length - 1)}
+                                x2={right}
+                                y1={y(last.quote)}
+                                y2={y(last.quote)}
+                            />
+                            {band.high_label && (
+                                <text x={right - 4} y={y(band.high) - 5} textAnchor='end'>
+                                    {band.high_label}
+                                </text>
+                            )}
+                            {band.low_label && (
+                                <text x={right - 4} y={y(band.low) + 14} textAnchor='end'>
+                                    {band.low_label}
+                                </text>
+                            )}
+                        </g>
+                    )}
+
                     {lines.map(line => (
-                        <g key={`${line.label}-${line.value}`} className={`vd-chart__marker vd-chart__marker--${line.tone}`}>
-                            <line x1={PADDING.left} x2={PADDING.left + plot_w} y1={y(line.value)} y2={y(line.value)} />
+                        <g
+                            key={`${line.label}-${line.value}`}
+                            className={`vd-chart__marker vd-chart__marker--${line.tone}`}
+                        >
+                            <line x1={PADDING.left} x2={right} y1={y(line.value)} y2={y(line.value)} />
                             <text x={PADDING.left + 6} y={y(line.value) - 5}>
                                 {line.label} {line.value.toFixed(pip_size)}
                             </text>
@@ -75,8 +142,8 @@ const TickChart = ({ ticks, pip_size, lines = [], height = 300 }: TTickChartProp
 
                     <circle cx={x(ticks.length - 1)} cy={y(last.quote)} r='4' className='vd-chart__dot' />
                     <g className='vd-chart__price'>
-                        <rect x={PADDING.left + plot_w + 2} y={y(last.quote) - 11} width={PADDING.right - 4} height='22' rx='4' />
-                        <text x={PADDING.left + plot_w + 8} y={y(last.quote) + 4}>
+                        <rect x={right + 2} y={y(last.quote) - 11} width={PADDING.right - 4} height='22' rx='4' />
+                        <text x={right + 8} y={y(last.quote) + 4}>
                             {last.quote.toFixed(pip_size)}
                         </text>
                     </g>

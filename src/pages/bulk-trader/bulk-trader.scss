@@ -411,8 +411,7 @@
         border-radius: 0.3rem;
         background:
             radial-gradient(circle at 30% 30%, #fff 0 2px, transparent 2.5px),
-            radial-gradient(circle at 70% 70%, #fff 0 2px, transparent 2.5px),
-            rgb(255 255 255 / 25%);
+            radial-gradient(circle at 70% 70%, #fff 0 2px, transparent 2.5px), rgb(255 255 255 / 25%);
     }
 
     &__payout {

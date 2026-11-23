@@ -1,202 +1,478 @@
 @use 'components/shared/styles/mixins' as *;
 
-.vd-page.vd-signal-ai {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+// Signal AI: a terminal page. Black background with flickering green status text,
+// a glowing cyan card for the settings, then a terminal window for the scan and the results.
+.vd-sig {
+    --sig-bg: #000;
+    --sig-green: #22e33a;
+    --sig-green-soft: #1fbf34;
+    --sig-cyan: #22e6ff;
+    --sig-red: #ff2a2a;
+    --sig-field: #101010;
+    --sig-text: #f2f2f2;
+    --sig-muted: #9aa0a6;
+    --sig-mono: 'Courier New', consolas, monospace;
+
+    position: relative;
+    display: grid;
+    place-items: center;
     overflow: hidden;
-    padding: 1.6rem 0 1.2rem;
-    background:
-        radial-gradient(circle at 20% 10%, rgb(249 115 22 / 8%), transparent 32%),
-        var(--vd-bg);
+    min-height: calc(100vh - 16rem);
+    padding: 3.2rem 1.6rem;
+    background: var(--sig-bg);
+    color: var(--sig-text);
 
     @include mobile-or-tablet-screen {
-        align-items: stretch;
-        overflow: auto;
-        height: auto;
-        padding: 1.2rem 1.2rem 9rem;
+        min-height: calc(100vh - 20rem);
+        padding: 2rem 1rem 9rem;
     }
 }
 
-.vd-signal-ai__setup,
-.vd-signal-ai__window {
-    width: min(72rem, 100%);
+// ---------------------------------------------------------------------------
+// Background wall of status text
+// ---------------------------------------------------------------------------
+.vd-sig__rain {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: var(--sig-green-soft);
+    font-family: var(--sig-mono);
+    font-size: 1.3rem;
+    line-height: 1.62rem;
+    white-space: nowrap;
+    opacity: 0.9;
+    pointer-events: none;
+    user-select: none;
+
+    div {
+        overflow: hidden;
+    }
 }
 
-.vd-signal-ai__setup {
+// ---------------------------------------------------------------------------
+// Settings card
+// ---------------------------------------------------------------------------
+.vd-sig-card {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
-    padding: 2.4rem;
-    border: 1px solid var(--vd-border);
-    border-radius: 1.4rem;
-    background: var(--vd-panel);
+    align-items: center;
+    gap: 1.6rem;
+    width: min(70rem, 100%);
+    padding: 2rem 2.4rem 2.4rem;
+    border: 3px solid var(--sig-cyan);
+    border-radius: 0.8rem;
+    background: rgb(0 0 0 / 82%);
+    box-shadow:
+        0 0 14px var(--sig-cyan),
+        0 0 40px rgb(34 230 255 / 45%),
+        inset 0 0 18px rgb(34 230 255 / 15%);
+    backdrop-filter: blur(3px);
+    animation: vd-sig-glow 2.4s ease-in-out infinite alternate;
 
-    h2 {
-        color: var(--vd-orange-text);
-        font-size: 2.8rem;
-        font-weight: 800;
+    @include mobile-screen {
+        padding: 1.6rem 1.4rem 2rem;
     }
 
-    p {
-        margin: 0;
-        color: #f7f4f2;
-        font-size: 1.4rem;
-        line-height: 1.5;
+    &__title {
+        color: var(--sig-red);
+        font-size: 2rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
     }
 
-    .vd-segmented {
-        display: inline-flex;
-        width: fit-content;
-        padding: 0.3rem;
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.4rem 2rem;
+        width: 100%;
+
+        @include mobile-screen {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &__tick {
+        display: grid;
+        place-items: center;
+        width: min(40rem, 100%);
+        min-height: 4.6rem;
+        padding: 0.8rem 1.6rem;
         border-radius: 0.8rem;
-        background: var(--vd-field);
+        background: #0a0a0a;
+        color: var(--sig-green);
+        font-family: var(--sig-mono);
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-shadow:
+            0 0 6px var(--sig-green),
+            0 0 14px rgb(34 227 58 / 60%);
+        box-shadow: 0 0 22px rgb(34 227 58 / 18%);
 
-        button {
-            padding: 0.8rem 1.6rem;
-            border: none;
-            border-radius: 0.6rem;
-            background: transparent;
-            color: #f7f4f2;
-            font-size: 1.4rem;
-            font-weight: 700;
-            cursor: pointer;
-
-            &.is-active {
-                background: var(--vd-orange);
-                color: #fff;
-            }
+        b {
+            color: #fff;
+            text-shadow: 0 0 8px #fff;
         }
     }
 }
 
-.vd-signal-ai__row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.2rem;
+@keyframes vd-sig-glow {
+    from {
+        box-shadow:
+            0 0 10px var(--sig-cyan),
+            0 0 28px rgb(34 230 255 / 35%),
+            inset 0 0 14px rgb(34 230 255 / 12%);
+    }
 
-    @include mobile-or-tablet-screen {
-        grid-template-columns: 1fr;
+    to {
+        box-shadow:
+            0 0 18px var(--sig-cyan),
+            0 0 52px rgb(34 230 255 / 55%),
+            inset 0 0 22px rgb(34 230 255 / 18%);
     }
 }
 
-.vd-page.vd-signal-ai .vd-signal-ai__go {
-    align-self: flex-start;
-    min-width: 16rem;
-    background: #20c58c;
-    color: #06281c;
-}
-
-.vd-signal-ai__window {
+.vd-sig-field {
     display: flex;
     flex-direction: column;
-    height: min(62rem, 100%);
-    overflow: hidden;
-    border: 1px solid var(--vd-orange);
-    border-radius: 1.2rem;
-    background: #140a05;
-    box-shadow: 0 0 0 1px rgb(249 115 22 / 25%), 0 18px 40px rgb(0 0 0 / 45%);
+    gap: 0.6rem;
+
+    span {
+        color: var(--sig-text);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    select,
+    input {
+        width: 100%;
+        height: 3.6rem;
+        padding: 0 1rem;
+        border: 1px solid #1d1d1d;
+        border-radius: 0.3rem;
+        background: var(--sig-field);
+        color: var(--sig-red);
+        font-size: 1.3rem;
+        font-weight: 600;
+        text-align: center;
+        text-align-last: center;
+        appearance: none;
+
+        &:focus-visible {
+            border-color: var(--sig-cyan);
+            outline: none;
+            box-shadow: 0 0 0 2px rgb(34 230 255 / 30%);
+        }
+    }
+
+    option {
+        background: #111;
+        color: var(--sig-red);
+    }
 }
 
-.vd-signal-ai__bar {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 1.2rem;
-    padding: 1rem 1.4rem;
-    border-bottom: 1px solid var(--vd-border);
-    background: #1f1008;
+// ---------------------------------------------------------------------------
+// Buttons
+// ---------------------------------------------------------------------------
+.vd-sig-btn {
+    min-height: 3.8rem;
+    padding: 0 2rem;
+    border: none;
+    border-radius: 0.4rem;
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        filter 0.15s ease,
+        transform 0.1s ease;
 
-    h2 {
-        margin: 0;
-        color: #f7f4f2;
-        font-size: 1.5rem;
+    &:hover:not(:disabled) {
+        filter: brightness(1.15);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--sig-cyan);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    &--go {
+        background: #0c8f1d;
+        box-shadow: 0 0 12px rgb(34 227 58 / 35%);
+    }
+
+    &--stop {
+        background: #7a1212;
+    }
+
+    &--bot {
+        border: 1px solid #1f6f4a;
+        background: #134d34;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Terminal window (scan log and results)
+// ---------------------------------------------------------------------------
+.vd-sig-win {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(86rem, 100%);
+    height: min(72rem, calc(100vh - 24rem));
+    min-height: 36rem;
+
+    // Leave room for the run panel handle and Run bar at the bottom on phones and tablets
+    @include mobile-or-tablet-screen {
+        height: calc(100vh - 30rem);
+    }
+    border: 2px solid var(--sig-cyan);
+    border-radius: 0.8rem;
+    background: #000;
+    box-shadow:
+        0 0 12px rgb(34 230 255 / 70%),
+        0 0 36px rgb(34 230 255 / 30%);
+    font-size: 1.2rem;
+
+    &__bar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1.4rem 1.6rem 0;
+    }
+
+    &__dots {
+        display: flex;
+        gap: 0.7rem;
+
+        i {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: #ff5f57;
+
+            &:nth-child(2) {
+                background: #febc2e;
+            }
+
+            &:nth-child(3) {
+                background: #28c840;
+            }
+        }
+    }
+
+    &__sound {
+        width: 3rem;
+        height: 2.6rem;
+        border: 1px solid #222;
+        border-radius: 0.3rem;
+        background: #0c0c0c;
+        font-size: 1.3rem;
+        cursor: pointer;
+
+        &:focus-visible {
+            outline: 2px solid var(--sig-cyan);
+        }
+    }
+
+    &__close {
+        width: 3rem;
+        height: 2.6rem;
+        border: none;
+        border-radius: 0.3rem;
+        background: #e01010;
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+
+        &:hover {
+            background: #ff2a2a;
+        }
+
+        &:focus-visible {
+            outline: 2px solid #fff;
+        }
+    }
+
+    &__title {
+        grid-column: 1 / -1;
+        margin-top: 1.4rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px solid rgb(34 230 255 / 55%);
+        color: var(--sig-green);
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    &__log {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.2rem 1.6rem;
+        color: var(--sig-green);
+        font-size: 1.15rem;
+        line-height: 1.95rem;
+        scrollbar-color: #134d34 transparent;
+
+        p {
+            margin: 0;
+            animation: vd-sig-line 0.18s ease-out;
+
+            &.is-error {
+                color: #ff6b6b;
+            }
+        }
+    }
+
+    &__cursor {
+        animation: vd-sig-blink 0.9s steps(1) infinite !important;
+    }
+
+    &__foot {
+        display: flex;
+        justify-content: center;
+        padding: 1rem 1.6rem 1.4rem;
+    }
+
+    &__body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+        overflow-y: auto;
+        padding: 1.4rem 1.6rem 1.8rem;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+}
+
+@keyframes vd-sig-line {
+    from {
+        opacity: 0;
+        transform: translateX(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes vd-sig-blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+// Results
+.vd-sig-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.2rem;
+
+    th {
+        padding: 1rem 0.8rem;
+        border-bottom: 1px solid #1c1c1c;
+        color: var(--sig-cyan);
+        font-size: 1.05rem;
+        font-weight: 600;
+        text-align: start;
+        text-transform: uppercase;
+    }
+
+    td {
+        padding: 1rem 0.8rem;
+        border-bottom: 1px solid #141414;
+        color: var(--sig-text);
+    }
+
+    tr.is-best td:nth-child(2) {
+        color: var(--sig-green);
         font-weight: 700;
     }
 }
 
-.vd-signal-ai__dots {
-    display: inline-flex;
-    gap: 0.45rem;
-
-    i {
-        width: 1rem;
-        height: 1rem;
-        border-radius: 50%;
-        background: var(--vd-down);
-
-        &:nth-child(2) {
-            background: var(--vd-warn);
-        }
-
-        &:nth-child(3) {
-            background: var(--vd-up);
-        }
-    }
-}
-
-.vd-signal-ai__close {
-    width: 3.2rem;
-    height: 3.2rem;
-    border: none;
+.vd-sig-best {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.6rem;
+    border: 1px solid #1d4d27;
     border-radius: 0.6rem;
-    background: var(--vd-down);
-    color: #fff;
-    font-size: 2rem;
-    line-height: 1;
-    cursor: pointer;
-}
+    background: #06180b;
+    color: var(--sig-text);
 
-.vd-signal-ai__log {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-    padding: 1.2rem 1.6rem;
-    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
-    font-size: 1.3rem;
-    line-height: 1.7;
+    h3 {
+        color: var(--sig-green);
+        font-size: 1.4rem;
+        font-weight: 700;
+        text-shadow: 0 0 8px rgb(34 227 58 / 50%);
+    }
 
-    p {
+    p,
+    li {
         margin: 0;
     }
 
-    time {
-        margin-inline-end: 0.8rem;
-        color: rgb(247 244 242 / 45%);
-    }
-
-    .is-up {
-        color: var(--vd-up);
-    }
-
-    .is-down {
-        color: var(--vd-down);
-    }
-
-    .is-warn {
-        color: var(--vd-warn);
-    }
-
-    .is-info {
-        color: #f7f4f2;
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin: 0;
+        padding-inline-start: 2rem;
+        list-style: none;
     }
 }
 
-.vd-signal-ai__window footer {
-    display: flex;
-    justify-content: center;
-    padding: 1.2rem;
-    border-top: 1px solid var(--vd-border);
+.vd-sig-note {
+    color: var(--sig-muted);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
 }
 
-.vd-signal-ai__stop {
-    min-height: 4rem;
-    padding: 0 2rem;
-    border: none;
-    border-radius: 0.8rem;
-    background: var(--vd-down);
-    color: #fff;
-    font-size: 1.5rem;
-    font-weight: 800;
-    cursor: pointer;
+.vd-sig-empty {
+    padding: 1.4rem;
+    border: 1px solid #3a1414;
+    border-radius: 0.6rem;
+    background: #160606;
+    color: #ff8a8a;
+    line-height: 1.5;
+    text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vd-sig-card,
+    .vd-sig-win__log p,
+    .vd-sig-win__cursor {
+        animation: none !important;
+    }
+}
+
+// The tab content is a flex row: take the full width instead of shrinking to the content.
+.vd-dcx,
+.vd-at,
+.vd-sig {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
 }

@@ -85,7 +85,7 @@ export const computeDigitStats = (ticks: TTick[], barrier = 4): TDigitStats => {
  * Length of the run at the end of the list where `test` gives the same answer.
  * E.g. digits [2, 3, 4, 6, 8] with `d => d % 2 === 0` → { value: true, length: 3 }.
  */
-export const getCurrentStreak = <T,>(items: T[], test: (item: T) => boolean) => {
+export const getCurrentStreak = <T>(items: T[], test: (item: T) => boolean) => {
     if (!items.length) return { value: false, length: 0 };
     const value = test(items[items.length - 1]);
     let length = 0;
@@ -122,8 +122,16 @@ export const mostUnusual = (ticks: TTick[]): TUnusualness => {
     const s = computeDigitStats(ticks, 4);
     const z = (share: number, p: number) => (share / 100 - p) / Math.sqrt((p * (1 - p)) / n);
     const candidates: TUnusualness[] = [
-        { score: Math.abs(z(s.even, 0.5)), label: `${s.even >= 50 ? 'Even' : 'Odd'} at ${Math.max(s.even, s.odd).toFixed(0)}% (fair: 50%)`, kind: s.even >= 50 ? 'even' : 'odd' },
-        { score: Math.abs(z(s.over, 0.5)), label: `${s.over >= 50 ? 'Digits 5-9' : 'Digits 0-4'} at ${Math.max(s.over, s.under).toFixed(0)}% (fair: 50%)`, kind: s.over >= 50 ? 'over' : 'under' },
+        {
+            score: Math.abs(z(s.even, 0.5)),
+            label: `${s.even >= 50 ? 'Even' : 'Odd'} at ${Math.max(s.even, s.odd).toFixed(0)}% (fair: 50%)`,
+            kind: s.even >= 50 ? 'even' : 'odd',
+        },
+        {
+            score: Math.abs(z(s.over, 0.5)),
+            label: `${s.over >= 50 ? 'Digits 5-9' : 'Digits 0-4'} at ${Math.max(s.over, s.under).toFixed(0)}% (fair: 50%)`,
+            kind: s.over >= 50 ? 'over' : 'under',
+        },
         ...s.percentages.map((p, d) => ({
             score: Math.abs(z(p, 0.1)),
             label: `Digit ${d} at ${p.toFixed(1)}% (fair: 10%)`,

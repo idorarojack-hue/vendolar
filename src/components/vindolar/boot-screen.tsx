@@ -69,7 +69,7 @@ const BootScreen = ({ target, status, done = false, onExit }: TBootScreenProps) 
                         <svg viewBox='0 0 26 26' width='26' height='26'>
                             <path
                                 d='M6 7 L12.5 19 L20 4'
-                                stroke='#ff9136'
+                                stroke='#4db6ac'
                                 strokeWidth='3'
                                 strokeLinecap='round'
                                 strokeLinejoin='round'

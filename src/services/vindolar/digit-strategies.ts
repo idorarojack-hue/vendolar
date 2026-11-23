@@ -14,7 +14,8 @@ export type TDigitTrade = Omit<TTradeDecision, 'symbol'>;
 export type TDigitRule = (digits: number[]) => TDigitTrade | null;
 
 const lastN = (digits: number[], n: number) => (digits.length >= n ? digits.slice(-n) : null);
-const allIn = (digits: number[] | null, low: number, high: number) => !!digits && digits.every(d => d >= low && d <= high);
+const allIn = (digits: number[] | null, low: number, high: number) =>
+    !!digits && digits.every(d => d >= low && d <= high);
 
 /** Run of `count` digits all ≤ `low_max` → Over `low_max`; all ≥ `high_min` → Under `high_min`. */
 export const rangeBounceRule =
@@ -22,10 +23,20 @@ export const rangeBounceRule =
     digits => {
         const recent = lastN(digits, count);
         if (low_max !== null && allIn(recent, 0, low_max)) {
-            return { contract_type: 'DIGITOVER', digit: low_max, duration: 1, reason: `Last ${count} digits ≤ ${low_max}` };
+            return {
+                contract_type: 'DIGITOVER',
+                digit: low_max,
+                duration: 1,
+                reason: `Last ${count} digits ≤ ${low_max}`,
+            };
         }
         if (high_min !== null && allIn(recent, high_min, 9)) {
-            return { contract_type: 'DIGITUNDER', digit: high_min, duration: 1, reason: `Last ${count} digits ≥ ${high_min}` };
+            return {
+                contract_type: 'DIGITUNDER',
+                digit: high_min,
+                duration: 1,
+                reason: `Last ${count} digits ≥ ${high_min}`,
+            };
         }
         return null;
     };
@@ -56,7 +67,11 @@ export const zigzagRule =
         const alternates = recent.every((d, i) => i === 0 || d % 2 !== recent[i - 1] % 2);
         if (!alternates) return null;
         const last_even = recent[recent.length - 1] % 2 === 0;
-        return { contract_type: last_even ? 'DIGITODD' : 'DIGITEVEN', duration: 1, reason: `Last ${count} digits alternate` };
+        return {
+            contract_type: last_even ? 'DIGITODD' : 'DIGITEVEN',
+            duration: 1,
+            reason: `Last ${count} digits alternate`,
+        };
     };
 
 /** Same digit twice in a row → Over 4 if it is 0-4, Under 5 if it is 5-9. */

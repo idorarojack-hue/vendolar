@@ -12,8 +12,23 @@ export type TProposalState = {
     /** Accumulators: highest possible payout and number of ticks. */
     max_payout?: number;
     max_ticks?: number;
+    /** Accumulators: current range around the spot, and how many ticks recent contracts stayed in range. */
+    high_barrier?: number;
+    low_barrier?: number;
+    barrier_spot_distance?: string;
+    ticks_stayed_in?: number[];
+    /** Turbos / vanillas: payout per point. */
+    payout_per_point?: string;
+    /** Multipliers: price level that closes the contract, and the deal-cancellation fee. */
+    stop_out?: number;
+    cancellation_fee?: number;
+    /** Turbos: fresh barrier choices for this side (they move with the price). */
+    barrier_choices?: string[];
     longcode?: string;
 };
+
+const toNumber = (value: unknown) =>
+    value === undefined || value === null || value === '' ? undefined : Number(value);
 
 /**
  * Live price quote (payout) for a contract, kept up to date while inputs stay the same.
@@ -50,6 +65,14 @@ export const useProposal = (
                     ask_price: Number(proposal.ask_price),
                     max_payout: proposal.contract_details?.maximum_payout,
                     max_ticks: proposal.contract_details?.maximum_ticks,
+                    high_barrier: toNumber(proposal.contract_details?.high_barrier),
+                    low_barrier: toNumber(proposal.contract_details?.low_barrier),
+                    barrier_spot_distance: proposal.contract_details?.barrier_spot_distance,
+                    ticks_stayed_in: proposal.contract_details?.ticks_stayed_in,
+                    payout_per_point: proposal.display_number_of_contracts,
+                    stop_out: toNumber(proposal.limit_order?.stop_out?.order_amount),
+                    cancellation_fee: toNumber(proposal.cancellation?.ask_price),
+                    barrier_choices: proposal.barrier_choices,
                     longcode: proposal.longcode,
                 });
             });

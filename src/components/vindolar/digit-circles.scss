@@ -1,0 +1,193 @@
+@use 'components/shared/styles/mixins' as *;
+
+// Digit circles: two rows of five, light discs, arc at the bottom shows each digit's share.
+.vd-dc {
+    --dc-text: #1f2937;
+    --dc-muted: #4b5563;
+    --dc-track: #e5e7eb;
+    --dc-arc: #9ca3af;
+    --dc-top: #4db6ac;
+    --dc-low: #e8424f;
+    --dc-selected: #1f1d3a;
+    --dc-pointer: #ef5350;
+
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2.2rem 0.8rem;
+    justify-items: center;
+    width: 100%;
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 0.4rem 0 1.4rem;
+
+    &__item {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        max-width: 7.6rem;
+        aspect-ratio: 1;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--dc-text);
+        font: inherit;
+
+        svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 1px 2px rgb(15 23 42 / 12%));
+        }
+
+        &--clickable {
+            cursor: pointer;
+
+            &:hover .vd-dc__disc {
+                fill: #f3f4f6;
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--dc-top);
+                outline-offset: 2px;
+                border-radius: 50%;
+            }
+        }
+
+        &--top .vd-dc__arc {
+            stroke: var(--dc-top);
+        }
+
+        &--low .vd-dc__arc {
+            stroke: var(--dc-low);
+        }
+
+        &--selected {
+            .vd-dc__disc {
+                fill: var(--dc-selected);
+            }
+
+            &.vd-dc__item--clickable:hover .vd-dc__disc {
+                fill: var(--dc-selected);
+            }
+
+            .vd-dc__label strong,
+            .vd-dc__label small {
+                color: #fff;
+            }
+        }
+    }
+
+    &__disc {
+        fill: #fff;
+        transition: fill 0.15s ease;
+    }
+
+    &__track {
+        fill: none;
+        stroke: var(--dc-track);
+    }
+
+    &__arc {
+        fill: none;
+        stroke: var(--dc-arc);
+        transition:
+            stroke-dasharray 0.4s ease,
+            stroke 0.2s ease;
+    }
+
+    &__label {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.1;
+        pointer-events: none;
+
+        strong {
+            color: var(--dc-text);
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        small {
+            color: var(--dc-muted);
+            font-size: 1.15rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    // Red triangle under the latest digit
+    &__pointer {
+        position: absolute;
+        bottom: -1.3rem;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-right: 0.7rem solid transparent;
+        border-bottom: 0.9rem solid var(--dc-pointer);
+        border-left: 0.7rem solid transparent;
+        transform: translateX(-50%);
+    }
+
+    @include mobile-screen {
+        gap: 1.8rem 0.4rem;
+
+        &__label {
+            strong {
+                font-size: 1.7rem;
+            }
+
+            small {
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+// Card wrapper used on pages that show the circles as an extra panel
+.vd-dc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.4rem 1.6rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.8rem;
+    background: #fafafa;
+
+    &__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+
+        span {
+            color: #374151;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        small {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+    }
+}
+
+// On the dark tool pages the card is a subtle panel; the discs stay white.
+.vd-page--dark .vd-dc-card {
+    border-color: rgb(255 255 255 / 10%);
+    background: rgb(255 255 255 / 4%);
+
+    .vd-dc-card__head span {
+        color: var(--vd-text, #f5f5f5);
+    }
+
+    .vd-dc-card__head small {
+        color: var(--vd-muted, #b8b8b8);
+    }
+}

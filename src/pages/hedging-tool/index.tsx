@@ -1,15 +1,16 @@
 import React from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
+import { LiveDigitCircles } from '@/components/vindolar/digit-circles';
 import NumberField from '@/components/vindolar/number-field';
 import { MarketSelect } from '@/components/vindolar/pickers';
+import ToolHero, { PageBackdrop } from '@/components/vindolar/tool-hero';
 import { useTicks, useVolatilitySymbols } from '@/hooks/useMarketData';
 import { usePersistentState } from '@/hooks/usePersistentState';
 import { usePositions } from '@/hooks/usePositions';
 import { useProposal } from '@/hooks/useProposal';
 import { useStore } from '@/hooks/useStore';
 import { TContractParams } from '@/services/vindolar/contracts';
-import ToolHero, { PageBackdrop } from '@/components/vindolar/tool-hero';
 import { localize } from '@deriv-com/translations';
 import Positions from '../manual-trader/positions';
 import '../manual-trader/manual-trader.scss';
@@ -160,6 +161,7 @@ const HedgingTool = observer(() => {
                             </select>
                         </label>
                     </div>
+                    <LiveDigitCircles symbol={symbol} />
                     <div className='vd-row'>
                         <NumberField label={localize('Stake per leg')} unit={currency} value={stake} min={0.35} onChange={setStake} />
                         <NumberField label={localize('Duration (ticks)')} value={duration} min={1} max={10} decimals={0} onChange={setDuration} />

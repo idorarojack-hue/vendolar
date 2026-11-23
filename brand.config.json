@@ -7,15 +7,15 @@
     },
     "domain_name": "Vindolar.com",
     "colors": {
-        "primary": "#ff9136",
-        "secondary": "#c16b20",
-        "tertiary": "#15c9ef",
-        "success": "#20c58c",
-        "danger": "#f06a50",
-        "warning": "#ffcb05",
-        "info": "#15c9ef",
+        "primary": "#8e0c52",
+        "secondary": "#1c315f",
+        "tertiary": "#4db6ac",
+        "success": "#2a9d92",
+        "danger": "#e0434f",
+        "warning": "#f5b300",
+        "info": "#4db6ac",
         "neutral": "#9ba8c7",
-        "black": "#1a0b03",
+        "black": "#1f1d3a",
         "white": "#ffffff",
         "grey": {
             "50": "#f8fafc",
@@ -48,30 +48,9 @@
         }
     },
     "color_variants": {
-        "light_variants": [
-            100,
-            200,
-            300,
-            400,
-            500
-        ],
-        "dark_variants": [
-            600,
-            700,
-            800,
-            900
-        ],
-        "opacity_variants": [
-            10,
-            20,
-            30,
-            40,
-            50,
-            60,
-            70,
-            80,
-            90
-        ]
+        "light_variants": [100, 200, 300, 400, 500],
+        "dark_variants": [600, 700, 800, 900],
+        "opacity_variants": [10, 20, 30, 40, 50, 60, 70, 80, 90]
     },
     "theme_config": {
         "enable_dynamic_themes": true,

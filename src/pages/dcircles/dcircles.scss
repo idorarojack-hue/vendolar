@@ -1,0 +1,581 @@
+@use 'components/shared/styles/mixins' as *;
+
+@mixin dcx-rank($color) {
+    .vd-digit__fill {
+        stroke: $color;
+        filter: none;
+    }
+}
+
+// DCircles: digit distribution rings, Even/Odd or Over/Under pattern, Rise/Fall, last digits stream.
+.vd-dcx {
+    --dcx-up: #1aa88b;
+    --dcx-up-dark: #12876f;
+    --dcx-down: #e0243c;
+    --dcx-down-dark: #b8152b;
+    --dcx-blue: #2563eb;
+    --dcx-amber: #d97706;
+    --dcx-navy: #1f3a8a;
+    --dcx-surface: #f4f6fb;
+
+    min-height: 100%;
+    padding: 1.6rem 0 8rem;
+    color: var(--vd-text);
+
+    @include mobile-or-tablet-screen {
+        padding: 1.2rem 1.2rem 10rem;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+        max-width: 96rem;
+        margin: 0 auto;
+    }
+
+    &__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.2rem;
+    }
+
+    &__price {
+        display: flex;
+        flex-direction: column;
+
+        strong {
+            color: var(--dcx-navy);
+            font-size: 3.2rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+        }
+
+        span {
+            color: var(--vd-muted);
+            font-size: 1.05rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    }
+
+    &__market {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.4rem;
+
+        select {
+            min-width: 22rem;
+            height: 3.2rem;
+            padding: 0 1rem;
+            border: 1px solid var(--vd-border);
+            border-radius: 10rem;
+            background: var(--vd-panel);
+            color: var(--dcx-navy);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        span {
+            color: var(--vd-muted);
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    }
+}
+
+.vd-dcx-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    padding: 2rem 1.6rem;
+    border: 1px solid var(--vd-border);
+    border-radius: 1.4rem;
+    background: var(--vd-panel);
+    box-shadow: 0 2px 10px rgb(var(--vd-ink) / 5%);
+
+    &__title {
+        color: var(--vd-text);
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-align: center;
+        text-transform: uppercase;
+
+        &--left {
+            text-align: start;
+        }
+    }
+
+    &__row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    &__label {
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--vd-border-soft);
+        color: var(--vd-muted);
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+}
+
+// Digit rings: one row of ten in a soft panel; white discs, rank colours on the arc
+.vd-dcx-rings {
+    padding: 1.6rem 1rem 2.4rem;
+    border: 1px solid var(--vd-border-soft);
+    border-radius: 1.2rem;
+    background: var(--dcx-surface);
+
+    .vd-digits {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 1.6rem 0.4rem;
+        justify-items: center;
+
+        @include mobile-screen {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+
+    .vd-digit {
+        &__disc {
+            fill: #fff;
+        }
+
+        &__track {
+            stroke: #dfe3ea;
+        }
+
+        &__fill {
+            stroke: #c3c9d4;
+        }
+
+        &__label strong,
+        &__label small {
+            color: var(--vd-text);
+        }
+
+        &__label small {
+            font-weight: 700;
+        }
+
+        &--top,
+        &--second,
+        &--second-low,
+        &--low {
+            .vd-digit__disc {
+                fill: #fff;
+            }
+
+            .vd-digit__track {
+                stroke: #dfe3ea;
+            }
+
+            .vd-digit__label strong,
+            .vd-digit__label small {
+                color: var(--vd-text);
+            }
+        }
+
+        &--top {
+            @include dcx-rank(#16a34a);
+        }
+
+        &--second {
+            @include dcx-rank(#2563eb);
+        }
+
+        &--second-low {
+            @include dcx-rank(#d97706);
+        }
+
+        &--low {
+            @include dcx-rank(#e11d48);
+        }
+
+        &__pointer {
+            bottom: -1.4rem;
+            border-bottom-color: #e0243c;
+        }
+    }
+}
+
+.vd-dcx-ranks {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.8rem;
+
+    @include mobile-screen {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+        padding: 0.8rem;
+        border: 1px solid var(--vd-border);
+        border-radius: 0.8rem;
+
+        small {
+            color: var(--vd-muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        strong {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        em {
+            color: var(--vd-muted);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        &--top strong {
+            color: #16a34a;
+        }
+
+        &--second strong {
+            color: var(--dcx-blue);
+        }
+
+        &--low strong {
+            color: #e11d48;
+        }
+
+        &--second-low strong {
+            color: var(--dcx-amber);
+        }
+    }
+}
+
+// Even/Odd · Over/Under toggle
+.vd-dcx-toggle {
+    display: inline-flex;
+    padding: 0.4rem;
+    border: 1px solid var(--vd-border);
+    border-radius: 10rem;
+    background: var(--dcx-surface);
+
+    button {
+        min-height: 3.6rem;
+        padding: 0 1.4rem;
+        border: none;
+        border-radius: 10rem;
+        background: transparent;
+        color: var(--vd-muted);
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+
+        &.is-active {
+            border: 1px solid #e6c46a;
+            background: #fff6dc;
+            color: var(--dcx-navy);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--vd-orange);
+        }
+    }
+}
+
+.vd-dcx-barrier {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    align-self: flex-end;
+    color: var(--vd-muted);
+    font-size: 1.2rem;
+
+    select {
+        height: 3.2rem;
+        padding: 0 1rem;
+        border: 1px solid var(--vd-border);
+        border-radius: 0.6rem;
+        background: var(--vd-panel);
+        color: var(--vd-text);
+        font-weight: 600;
+    }
+}
+
+// Big percentage cards
+.vd-dcx-split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+
+    &__card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        min-height: 8rem;
+        border-radius: 1rem;
+        color: #fff;
+        box-shadow: 0 6px 14px rgb(var(--vd-ink) / 12%);
+
+        strong {
+            font-size: 2.6rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        span {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        &--up {
+            background: linear-gradient(180deg, #2bc39a, var(--dcx-up-dark));
+        }
+
+        &--down {
+            background: linear-gradient(180deg, #f0304a, var(--dcx-down-dark));
+        }
+    }
+}
+
+// Letter / digit chips
+.vd-dcx-chips,
+.vd-dcx-stream {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.vd-dcx-stream {
+    max-height: 22rem;
+    overflow-y: auto;
+    padding: 0.8rem;
+    border: 1px solid var(--vd-border-soft);
+    border-radius: 0.8rem;
+    background: var(--dcx-surface);
+}
+
+.vd-dcx-chip {
+    display: grid;
+    place-items: center;
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 0.6rem;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 15%);
+
+    &.is-up {
+        background: linear-gradient(180deg, #2bc39a, var(--dcx-up-dark));
+    }
+
+    &.is-down {
+        background: linear-gradient(180deg, #f0304a, var(--dcx-down-dark));
+    }
+
+    &.is-latest {
+        outline: 2px solid var(--dcx-navy);
+        outline-offset: 1px;
+    }
+
+    @include mobile-screen {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.3rem;
+    }
+}
+
+// Statistics
+.vd-dcx-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+
+    @include mobile-screen {
+        grid-template-columns: 1fr;
+    }
+
+    > label,
+    > div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: 4.4rem;
+        padding: 0 1.2rem;
+        border: 1px solid var(--vd-border);
+        border-radius: 1rem;
+        color: var(--vd-muted);
+        font-size: 1.2rem;
+    }
+
+    strong,
+    select {
+        color: var(--dcx-navy);
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    select {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+    }
+}
+
+.vd-dcx-note {
+    color: var(--vd-muted);
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+// ---------------------------------------------------------------------------
+// Responsive behaviour
+// ---------------------------------------------------------------------------
+
+// Market picker: readable height everywhere, full width on phones
+.vd-dcx__market select {
+    height: 3.8rem;
+    line-height: 1.2;
+    padding-block: 0;
+}
+
+@include mobile-screen {
+    .vd-dcx__head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .vd-dcx__market {
+        align-items: stretch;
+
+        select {
+            width: 100%;
+            min-width: 0;
+        }
+
+        span {
+            text-align: end;
+        }
+    }
+
+    .vd-dcx__price strong {
+        font-size: 2.6rem;
+    }
+
+    .vd-dcx-card {
+        padding: 1.6rem 1.2rem;
+        border-radius: 1.2rem;
+    }
+
+    .vd-dcx-split__card {
+        min-height: 6.8rem;
+
+        strong {
+            font-size: 2.2rem;
+        }
+    }
+}
+
+// Rings: one row of ten when the card is wide enough, otherwise two rows of five.
+// Uses the card's own width, so it also works with the run panel open on desktop.
+.vd-dcx-rings {
+    container-type: inline-size;
+
+    .vd-digits {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+    }
+
+    .vd-digit {
+        max-width: 100%;
+    }
+}
+
+@container (max-width: 720px) {
+    .vd-dcx-rings .vd-digits {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        row-gap: 2rem;
+    }
+}
+
+@container (max-width: 340px) {
+    .vd-dcx-rings .vd-digit {
+        width: 52px !important;
+        height: 52px !important;
+
+        svg {
+            width: 52px;
+            height: 52px;
+        }
+    }
+}
+
+// Chips fill each row evenly at any width
+.vd-dcx-chips,
+.vd-dcx-stream {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(3.4rem, 1fr));
+}
+
+.vd-dcx-chip {
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    min-width: 0;
+}
+
+@include mobile-screen {
+    .vd-dcx-chips,
+    .vd-dcx-stream {
+        grid-template-columns: repeat(auto-fill, minmax(2.8rem, 1fr));
+        gap: 0.4rem;
+    }
+}
+
+// Rank cards: four across, two on narrow screens
+@media (max-width: 480px) {
+    .vd-dcx-ranks__item strong {
+        font-size: 1.15rem;
+    }
+}
+
+// Centre the text in the styled select and draw a chevron (the global reset removes the native one)
+.vd-dcx__market select,
+.vd-dcx-barrier select {
+    padding: 0 3rem 0 1.2rem;
+    line-height: 3.6rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231f3a8a' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.1rem center;
+    background-size: 1rem 0.7rem;
+    cursor: pointer;
+}
+
+// The tab content is a flex row: take the full width instead of shrinking to the content.
+.vd-dcx,
+.vd-at,
+.vd-sig {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+}

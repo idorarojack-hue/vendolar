@@ -68,7 +68,7 @@
     padding: 2.4rem;
     border-radius: 1.6rem;
     background: var(--vd-bar);
-    color: #fff;
+    color: var(--vd-text);
 
     @include mobile-or-tablet-screen {
         padding: 1.6rem;
@@ -88,14 +88,14 @@
         font-size: 1.5rem;
 
         small {
-            color: rgb(255 255 255 / 65%);
+            color: rgb(var(--vd-ink) / 65%);
             font-size: 1.2rem;
             font-weight: 400;
         }
     }
 
     p {
-        color: rgb(255 255 255 / 85%);
+        color: rgb(var(--vd-ink) / 85%);
         font-size: 1.4rem;
         line-height: 1.6;
     }
@@ -131,11 +131,11 @@
         align-items: center;
         padding: 0.6rem 1rem;
         border-radius: 0.6rem;
-        background: rgb(255 255 255 / 6%);
+        background: rgb(var(--vd-ink) / 6%);
         font-size: 1.3rem;
 
         &--ready {
-            background: rgb(255 145 54 / 22%);
+            background: rgb(var(--vd-accent-rgb) / 22%);
         }
     }
 
@@ -149,7 +149,7 @@
         overflow: hidden;
         height: 0.6rem;
         border-radius: 1rem;
-        background: rgb(255 255 255 / 12%);
+        background: rgb(var(--vd-ink) / 12%);
 
         span {
             display: block;
@@ -161,7 +161,7 @@
     }
 
     &__label {
-        color: rgb(255 255 255 / 80%);
+        color: rgb(var(--vd-ink) / 80%);
         font-size: 1.2rem;
         text-align: end;
         font-variant-numeric: tabular-nums;

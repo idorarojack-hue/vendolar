@@ -276,13 +276,20 @@ export class AutoTrader {
 
         try {
             const bought = await buyContract(params);
-            const open: TTradeRecord = { ...record, id: bought.contract_id, payout: Number(bought.payout), stake: Number(bought.buy_price) };
+            const open: TTradeRecord = {
+                ...record,
+                id: bought.contract_id,
+                payout: Number(bought.payout),
+                stake: Number(bought.buy_price),
+            };
             this.setState({
                 status: this.state.status === 'stopping' ? 'stopping' : 'in_trade',
                 open_trade: open,
                 total_stake: round2(this.state.total_stake + open.stake),
             });
-            this.contract_watcher = watchContract(bought.contract_id, contract => this.onContractUpdate(open, contract));
+            this.contract_watcher = watchContract(bought.contract_id, contract =>
+                this.onContractUpdate(open, contract)
+            );
         } catch (error: any) {
             this.setState({ open_trade: undefined });
             this.tick_unsubscribers.forEach(u => u());
@@ -332,7 +339,8 @@ export class AutoTrader {
         const trade_count = this.state.wins + this.state.losses;
         if (session_profit >= settings.take_profit) this.stop(`Take profit reached (+${session_profit.toFixed(2)})`);
         else if (-session_profit >= settings.stop_loss) this.stop(`Stop loss reached (${session_profit.toFixed(2)})`);
-        else if (settings.max_trades && trade_count >= settings.max_trades) this.stop(`Trade limit reached (${trade_count})`);
+        else if (settings.max_trades && trade_count >= settings.max_trades)
+            this.stop(`Trade limit reached (${trade_count})`);
         else this.setState({ status: 'waiting' });
     }
 }

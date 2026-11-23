@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import { addComma, getCurrencyDisplayCode, getDecimalPlaces } from '@/components/shared';
-import Text from '@/components/shared_ui/text';
 import { api_base } from '@/external/bot-skeleton/services/api/api-base';
+import { publishLiveBalance } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
 import { useApiBase } from '@/hooks/useApiBase';
-import { useStore } from '@/hooks/useStore';
-import { isDemoAccount } from '@/utils/account-helpers';
 import { useLogout } from '@/hooks/useLogout';
+import { useStore } from '@/hooks/useStore';
+import { DerivWSAccountsService } from '@/services/derivws-accounts.service';
+import { OAuthTokenExchangeService } from '@/services/oauth-token-exchange.service';
+import { isDemoAccount } from '@/utils/account-helpers';
 import { Localize, localize } from '@deriv-com/translations';
 import { TAccountSwitcher } from './common/types';
 import AccountInfoWrapper from './account-info-wrapper';
@@ -36,13 +38,7 @@ const FlagMark = ({ code }: { code: string }) => {
                 ))}
                 <rect width='26' height={stripe * 7} fill='#3c3b6e' />
                 {Array.from({ length: 9 }, (_, i) => (
-                    <circle
-                        key={i}
-                        cx={4 + (i % 3) * 8}
-                        cy={3.2 + Math.floor(i / 3) * 4.6}
-                        r='1.1'
-                        fill='#fff'
-                    />
+                    <circle key={i} cx={4 + (i % 3) * 8} cy={3.2 + Math.floor(i / 3) * 4.6} r='1.1' fill='#fff' />
                 ))}
             </svg>
         );
@@ -97,6 +93,7 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
     const [accountTab, setAccountTab] = useState<'real' | 'demo'>('real');
     const [displayCurrency, setDisplayCurrency] = useState(() => localStorage.getItem(DISPLAY_CURRENCY_KEY) || '');
     const [kesPerUsd, setKesPerUsd] = useState<number | null>(null);
+    const [reset, setReset] = useState<{ busy: boolean; tone?: 'ok' | 'error'; text?: string }>({ busy: false });
     const wrapperRef = useRef<HTMLDivElement>(null);
     const { accountList, activeLoginid } = useApiBase();
     const { client, run_panel } = useStore() ?? {};
@@ -168,6 +165,39 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
         localStorage.setItem(DISPLAY_CURRENCY_KEY, code);
     };
 
+    // Demo only: Deriv's reset-demo-balance endpoint puts the demo account back to 10,000 USD.
+    const resetDemoBalance = async (loginid: string) => {
+        if (reset.busy) return;
+        const token = OAuthTokenExchangeService.getAccessToken();
+        if (!token) {
+            setReset({ busy: false, tone: 'error', text: localize('Please log in again to reset the demo balance.') });
+            return;
+        }
+        setReset({ busy: true });
+        try {
+            await DerivWSAccountsService.resetDemoBalance(token, loginid);
+            setReset({ busy: false, tone: 'ok', text: localize('Demo balance reset.') });
+        } catch (e: any) {
+            setReset({
+                busy: false,
+                tone: 'error',
+                text: e?.message ?? localize('The demo balance could not be reset.'),
+            });
+            return;
+        }
+        // Show the new balance right away; the balance stream also catches up on its own.
+        try {
+            const response: any = await api_base.api?.send({ balance: 1 });
+            const amount = Number(response?.balance?.balance);
+            if (Number.isFinite(amount)) {
+                client?.setBalance(amount.toString());
+                publishLiveBalance(loginid, amount);
+            }
+        } catch {
+            // The stream will deliver the balance.
+        }
+    };
+
     const handleAccountSelect = useCallback(
         (loginid: string) => {
             localStorage.setItem('active_loginid', loginid);
@@ -199,7 +229,10 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
     const accountCurrencies = Array.from(
         new Set(visibleAccounts.map(account => getCurrencyDisplayCode(account.currency || '')))
     ).filter(Boolean);
-    const currencies = accountCurrencies.includes(KSH) || accountCurrencies.includes('KES') ? accountCurrencies : [...accountCurrencies, KSH];
+    const currencies =
+        accountCurrencies.includes(KSH) || accountCurrencies.includes('KES')
+            ? accountCurrencies
+            : [...accountCurrencies, KSH];
     const selectedCurrency = currencies.includes(displayCurrency) ? displayCurrency : accountCurrencies[0] || '';
     const showingShillings = selectedCurrency === KSH && !accountCurrencies.includes(KSH);
     const listedAccounts = showingShillings
@@ -214,7 +247,9 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
     const currencyCode = getCurrencyDisplayCode(currency || '');
     const liveAccount = displayedAccounts.find(account => account.isActive);
     const shownBalance =
-        showingShillings && liveAccount && kesPerUsd ? `${asShillings(liveAccount.raw)} ${KSH}` : `${liveAccount?.balance || balance} ${currencyCode}`;
+        showingShillings && liveAccount && kesPerUsd
+            ? `${asShillings(liveAccount.raw)} ${KSH}`
+            : `${liveAccount?.balance || balance} ${currencyCode}`;
     const headerFlag = showingShillings ? KSH : currencyCode;
     const showChevron = !is_bot_running;
 
@@ -253,11 +288,7 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                                         'acc-info__balance--no-currency': !currency,
                                     })}
                                 >
-                                    {!currency ? (
-                                        <Localize i18n_default_text='No currency assigned' />
-                                    ) : (
-                                        shownBalance
-                                    )}
+                                    {!currency ? <Localize i18n_default_text='No currency assigned' /> : shownBalance}
                                 </p>
                             </div>
                         )}
@@ -284,10 +315,22 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
             {isOpen && (
                 <div className='acc-dropdown' role='listbox' aria-label={localize('Accounts')}>
                     <div className='acc-dropdown__tabs' role='tablist'>
-                        <button type='button' role='tab' aria-selected={accountTab === 'real'} className={classNames({ 'is-active': accountTab === 'real' })} onClick={() => setAccountTab('real')}>
+                        <button
+                            type='button'
+                            role='tab'
+                            aria-selected={accountTab === 'real'}
+                            className={classNames({ 'is-active': accountTab === 'real' })}
+                            onClick={() => setAccountTab('real')}
+                        >
                             <Localize i18n_default_text='Real' />
                         </button>
-                        <button type='button' role='tab' aria-selected={accountTab === 'demo'} className={classNames({ 'is-active': accountTab === 'demo' })} onClick={() => setAccountTab('demo')}>
+                        <button
+                            type='button'
+                            role='tab'
+                            aria-selected={accountTab === 'demo'}
+                            className={classNames({ 'is-active': accountTab === 'demo' })}
+                            onClick={() => setAccountTab('demo')}
+                        >
                             <Localize i18n_default_text='Demo' />
                         </button>
                     </div>
@@ -299,7 +342,9 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                             <button
                                 key={code}
                                 type='button'
-                                className={classNames('acc-dropdown__currency', { 'is-selected': code === selectedCurrency })}
+                                className={classNames('acc-dropdown__currency', {
+                                    'is-selected': code === selectedCurrency,
+                                })}
                                 onClick={() => chooseDisplayCurrency(code)}
                             >
                                 <strong>{code}</strong>
@@ -344,7 +389,9 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                                 <FlagMark code={getCurrencyDisplayCode(account.currency || '')} />
                             </span>
                             <span className='acc-dropdown__meta'>
-                                <strong>{getCurrencyDisplayCode(account.currency || '') || localize('No currency')}</strong>
+                                <strong>
+                                    {getCurrencyDisplayCode(account.currency || '') || localize('No currency')}
+                                </strong>
                                 <small>{account.loginid}</small>
                             </span>
                             <span className='acc-dropdown__amount'>
@@ -354,8 +401,33 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                                         : localize('Fetching rate…')
                                     : `${account.balance} ${getCurrencyDisplayCode(account.currency || '')}`}
                             </span>
+                            {account.isVirtual && account.isActive && (
+                                <button
+                                    type='button'
+                                    className='acc-dropdown__reset'
+                                    disabled={reset.busy}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        resetDemoBalance(account.loginid);
+                                    }}
+                                    onKeyDown={e => e.stopPropagation()}
+                                >
+                                    {reset.busy ? localize('Resetting…') : localize('Reset balance')}
+                                </button>
+                            )}
                         </div>
                     ))}
+                    {accountTab === 'demo' && reset.text && (
+                        <p
+                            className={classNames(
+                                'acc-dropdown__reset-note',
+                                `acc-dropdown__reset-note--${reset.tone}`
+                            )}
+                            role='status'
+                        >
+                            {reset.text}
+                        </p>
+                    )}
                     <a className='acc-dropdown__hub' href={TRADERS_HUB_URL} target='_blank' rel='noopener noreferrer'>
                         <Localize i18n_default_text="Looking for CFD accounts? Go to Trader's Hub" />
                     </a>

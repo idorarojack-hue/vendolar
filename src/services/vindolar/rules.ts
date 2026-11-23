@@ -55,7 +55,13 @@ const TEST_LABEL: Record<TDigitTest, (v?: number) => string> = {
 export const describeCondition = (c: TCondition) => {
     if (c.kind === 'last_digits') return `Last ${c.count} digits all ${TEST_LABEL[c.test](c.value)}`;
     const metric =
-        c.metric === 'over' ? `Over ${c.value}` : c.metric === 'under' ? `Under ${(c.value ?? 0) + 1}` : c.metric === 'digit' ? `Digit ${c.value}` : c.metric[0].toUpperCase() + c.metric.slice(1);
+        c.metric === 'over'
+            ? `Over ${c.value}`
+            : c.metric === 'under'
+              ? `Under ${(c.value ?? 0) + 1}`
+              : c.metric === 'digit'
+                ? `Digit ${c.value}`
+                : c.metric[0].toUpperCase() + c.metric.slice(1);
     return `${metric} ${c.op === '>=' ? '≥' : '≤'} ${c.threshold}% over ${c.window} ticks`;
 };
 

@@ -33,7 +33,24 @@ export type TOpenContract = {
     currency?: string;
     date_start?: number;
     longcode?: string;
+    /** Multipliers / accumulators */
+    multiplier?: number;
+    is_valid_to_cancel?: number;
+    is_valid_to_update?: number;
+    limit_order?: {
+        take_profit?: { order_amount?: number | null; value?: string };
+        stop_loss?: { order_amount?: number | null; value?: string };
+        stop_out?: { order_amount?: number | null; value?: string };
+    };
+    cancellation?: { ask_price?: number; date_expiry?: number };
+    purchase_time?: number;
 };
+
+/**
+ * Emitted with every update of a contract placed by the Vindolar tools (Manual Trader, Bulk Trader,
+ * auto sessions...). The run panel listens so these trades show in Summary / Transactions too.
+ */
+export const TOOL_CONTRACT_EVENT = 'vindolar.contract';
 
 export class TradingError extends Error {
     code?: string;
@@ -185,6 +202,7 @@ export const watchContract = (contract_id: number, onUpdate: (contract: TOpenCon
             is_recorded = true;
             recordTradeResult(Number(contract.profit));
         }
+        if (contract.transaction_ids?.buy) globalObserver.emit(TOOL_CONTRACT_EVENT, contract);
         onUpdate(contract);
     });
 
@@ -290,6 +308,132 @@ export const getStatement = async ({ limit = 50, offset = 0, date_from, date_to 
             ...(date_to ? { date_to } : {}),
         });
         return (response?.statement?.transactions ?? []) as any[];
+    } catch (e) {
+        throw toTradingError(e);
+    }
+};
+
+// ---------------------------------------------------------------------------
+// Open positions, live account transactions, contract changes
+// ---------------------------------------------------------------------------
+
+export type TPortfolioContract = {
+    contract_id: number;
+    contract_type: string;
+    buy_price: number;
+    payout?: number;
+    underlying_symbol?: string;
+    symbol?: string;
+    longcode?: string;
+    purchase_time?: number;
+    currency?: string;
+};
+
+/** Open contracts on the logged-in account (`portfolio`), e.g. to show them again after a page reload. */
+export const getOpenContracts = async (): Promise<TPortfolioContract[]> => {
+    const api = getApi();
+    try {
+        const response: any = await send(api, { portfolio: 1 });
+        return (response?.portfolio?.contracts ?? []).map((c: any) => ({
+            ...c,
+            contract_id: Number(c.contract_id),
+            buy_price: Number(c.buy_price),
+            payout: c.payout === undefined ? undefined : Number(c.payout),
+        }));
+    } catch (e) {
+        throw toTradingError(e);
+    }
+};
+
+export type TAccountTransaction = {
+    action: 'buy' | 'sell' | 'deposit' | 'withdrawal' | string;
+    amount: number;
+    balance: number;
+    contract_id?: number;
+    currency?: string;
+    longcode?: string;
+    underlying_symbol?: string;
+    transaction_id?: number;
+};
+
+/**
+ * Live stream of every transaction on the account (`transaction`): buys and sells from any tool, tab or
+ * app, plus deposits and withdrawals. Returns a stop function.
+ */
+export const subscribeTransactions = (onTransaction: (transaction: TAccountTransaction) => void) => {
+    const api = getApi();
+    let subscription_id: string | undefined;
+    let is_active = true;
+
+    const listener = api.onMessage().subscribe((message: any) => {
+        const data = message?.data ?? message;
+        if (data?.msg_type !== 'transaction' || !data.transaction?.action) return;
+        if (subscription_id && data.subscription?.id && data.subscription.id !== subscription_id) return;
+        const t = data.transaction;
+        noteBalance(t.balance);
+        onTransaction({
+            ...t,
+            amount: Number(t.amount),
+            balance: Number(t.balance),
+            contract_id: t.contract_id === undefined ? undefined : Number(t.contract_id),
+        });
+    });
+
+    send(api, { transaction: 1, subscribe: 1 })
+        .then((response: any) => {
+            subscription_id = response?.subscription?.id;
+            if (!is_active && subscription_id) send(api, { forget: subscription_id }).catch(() => undefined);
+        })
+        .catch(() => undefined);
+
+    return () => {
+        is_active = false;
+        listener.unsubscribe();
+        if (subscription_id) send(api, { forget: subscription_id }).catch(() => undefined);
+    };
+};
+
+/**
+ * Change take profit / stop loss on an open multiplier or accumulator contract (`contract_update`).
+ * Pass `null` to remove one; leave a field out to keep it as it is.
+ */
+export const updateContractLimits = async (
+    contract_id: number,
+    limits: { take_profit?: number | null; stop_loss?: number | null }
+) => {
+    const api = getApi();
+    try {
+        const response: any = await send(api, { contract_update: 1, contract_id, limit_order: limits });
+        return response.contract_update;
+    } catch (e) {
+        throw toTradingError(e);
+    }
+};
+
+/** Cancel a multiplier contract during its deal-cancellation window (`cancel`): the stake is refunded. */
+export const cancelContract = async (contract_id: number) => {
+    const api = getApi();
+    try {
+        const response: any = await send(api, { cancel: contract_id });
+        noteBalance(response?.cancel?.balance_after);
+        return response.cancel as { sold_for: number; balance_after: number; transaction_id: number };
+    } catch (e) {
+        throw toTradingError(e);
+    }
+};
+
+/** Past take profit / stop loss changes of a contract (`contract_update_history`), newest first. */
+export const getContractUpdateHistory = async (contract_id: number) => {
+    const api = getApi();
+    try {
+        const response: any = await send(api, { contract_update_history: 1, contract_id, limit: 50 });
+        return (response?.contract_update_history ?? []) as {
+            display_name: string;
+            order_amount: string | number;
+            order_date: number;
+            order_type: string;
+            value?: string;
+        }[];
     } catch (e) {
         throw toTradingError(e);
     }

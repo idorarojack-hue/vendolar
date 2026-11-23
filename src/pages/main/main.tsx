@@ -10,6 +10,7 @@ import MobileWrapper from '@/components/shared_ui/mobile-wrapper';
 import Tabs from '@/components/shared_ui/tabs/tabs';
 import TradeTypeConfirmationModal from '@/components/trade-type-confirmation-modal';
 import TradingViewModal from '@/components/trading-view-chart/trading-view-modal';
+import FloatingScanner from '@/components/vindolar/floating-scanner';
 import { DBOT_TABS, LAST_TAB_ID, NAV_TABS, TAB_HASHES, TAB_IDS, TNavTabKey } from '@/constants/bot-contents';
 import { api_base, updateWorkspaceName } from '@/external/bot-skeleton';
 import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
@@ -56,7 +57,6 @@ import RunPanel from '../../components/run-panel';
 import ChartModal from '../chart/chart-modal';
 import Dashboard from '../dashboard';
 import RunStrategy from '../dashboard/run-strategy';
-import FloatingScanner from '@/components/vindolar/floating-scanner';
 import GlobalStatus from './global-status';
 import TickerUnderTabs from './ticker-under-tabs';
 import './main.scss';
@@ -75,6 +75,7 @@ const PatternBots = lazy(() => import('../pattern-bots'));
 const MarketScanner = lazy(() => import('../market-scanner'));
 const QuickBot = lazy(() => import('../quick-bot'));
 const Signals = lazy(() => import('../signals'));
+const DCircles = lazy(() => import('../dcircles'));
 const CopyTrader = lazy(() => import('../copy-trader'));
 const SpeedTrader = lazy(() => import('../speed-trader'));
 const Automated = lazy(() => import('../automated'));
@@ -454,8 +455,14 @@ const AppWrapper = observer(() => {
             icon: <LabelPairedArrowsRotateCaptionRegularIcon {...NAV_ICON_PROPS} />,
             content: withLoader(<RecoveryTrader />),
         },
-        FREE_BOTS: { icon: <LabelPairedGridCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<FreeBots />) },
-        BULK_TRADER: { icon: <LabelPairedCloneCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<BulkTrader />) },
+        FREE_BOTS: {
+            icon: <LabelPairedGridCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<FreeBots />),
+        },
+        BULK_TRADER: {
+            icon: <LabelPairedCloneCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<BulkTrader />),
+        },
         ANALYSIS_TOOLS: {
             icon: <LabelPairedChartMixedCaptionRegularIcon {...NAV_ICON_PROPS} />,
             content: withLoader(<AnalysisTools />),
@@ -488,14 +495,38 @@ const AppWrapper = observer(() => {
             icon: <LabelPairedMagnifyingGlassPlusCaptionRegularIcon {...NAV_ICON_PROPS} />,
             content: withLoader(<MarketScanner />),
         },
-        QUICK_BOT: { icon: <LabelPairedSlidersCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<QuickBot />) },
+        QUICK_BOT: {
+            icon: <LabelPairedSlidersCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<QuickBot />),
+        },
         SIGNALS: { icon: <LabelPairedBellCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<Signals />) },
-        COPY_TRADER: { icon: <LabelPairedUsersCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<CopyTrader />) },
+        DCIRCLES: {
+            icon: (
+                <svg width='16' height='16' viewBox='0 0 16 16' fill='none' aria-hidden='true'>
+                    <circle cx='8' cy='8' r='6.2' stroke='currentColor' strokeWidth='1.5' />
+                    <path
+                        d='M8 1.8a6.2 6.2 0 0 1 6.2 6.2'
+                        stroke='currentColor'
+                        strokeWidth='2.4'
+                        strokeLinecap='round'
+                    />
+                    <circle cx='8' cy='8' r='1.6' fill='currentColor' />
+                </svg>
+            ),
+            content: withLoader(<DCircles />),
+        },
+        COPY_TRADER: {
+            icon: <LabelPairedUsersCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<CopyTrader />),
+        },
         SPEED_TRADER: {
             icon: <LabelPairedGaugeMaxCaptionRegularIcon {...NAV_ICON_PROPS} />,
             content: withLoader(<SpeedTrader />),
         },
-        AUTOMATED: { icon: <LabelPairedGearCaptionRegularIcon {...NAV_ICON_PROPS} />, content: withLoader(<Automated />) },
+        AUTOMATED: {
+            icon: <LabelPairedGearCaptionRegularIcon {...NAV_ICON_PROPS} />,
+            content: withLoader(<Automated />),
+        },
         CHART: {
             icon: <LabelPairedChartLineCaptionRegularIcon {...NAV_ICON_PROPS} />,
             id: is_chart_modal_visible || is_trading_view_modal_visible ? 'id-charts--disabled' : 'id-charts',
@@ -506,9 +537,7 @@ const AppWrapper = observer(() => {
             ),
         },
         TUTORIAL: {
-            icon: (
-                <LegacyGuide1pxIcon height='16px' width='16px' fill='currentColor' />
-            ),
+            icon: <LegacyGuide1pxIcon height='16px' width='16px' fill='currentColor' />,
             content: (
                 <div className='tutorials-wrapper'>
                     <Suspense fallback={<ChunkLoader message={localize('Please wait, loading tutorials...')} />}>
@@ -521,7 +550,13 @@ const AppWrapper = observer(() => {
 
     return (
         <React.Fragment>
-            <div className='main'>
+            <div
+                className={classNames('main', {
+                    // Tool tabs make room for the open run panel (Bot Builder and Chart handle it themselves).
+                    'main--run-panel-open':
+                        isDesktop && is_drawer_open && ![DBOT_TABS.BOT_BUILDER, DBOT_TABS.CHART].includes(active_tab),
+                })}
+            >
                 <div
                     className={classNames('main__container', {
                         'main__container--active': active_tour && active_tab === DASHBOARD && !isDesktop,
@@ -539,7 +574,9 @@ const AppWrapper = observer(() => {
                                             <span className='vd-nav-label'>
                                                 {page.icon}
                                                 <Localize i18n_default_text={tab.label} />
-                                                {tab.key === 'AUTO_STRATEGIES' && <span className='vd-nav-badge'>{localize('new')}</span>}
+                                                {tab.key === 'AUTO_STRATEGIES' && (
+                                                    <span className='vd-nav-badge'>{localize('new')}</span>
+                                                )}
                                             </span>
                                         }
                                         id={page.id ?? tab.id}
@@ -562,24 +599,22 @@ const AppWrapper = observer(() => {
                  * The run panel (Summary / Transactions / Journal) must not live inside the Run bar:
                  * the bar is centred with a CSS transform, which traps fixed-position children, and the
                  * panel ended up below the bottom of the screen — Run worked but showed nothing.
+                 * It is on every tab: it also lists the trades placed from the tools, and its Reset clears them.
                  */}
-                <div className={classNames('vd-run-panel-slot', { 'vd-hidden': !show_bot_controls })}>
+                <div className={classNames('vd-run-panel-slot', { 'vd-run-panel-slot--tools': !show_bot_controls })}>
                     <RunPanel />
                 </div>
                 <ChartModal />
                 <TradingViewModal />
             </DesktopWrapper>
             <MobileWrapper>
-                {/* Hidden (not unmounted) on tool tabs: the run panel keeps its bot listeners while mounted. */}
-                <div className={classNames('vd-run-panel-slot', { 'vd-hidden': !show_bot_controls })}>
-                    {!is_open && <RunPanel />}
+                {/* On tool tabs the panel stays, without the bot's Run controls. */}
+                <div className={classNames('vd-run-panel-slot', { 'vd-run-panel-slot--tools': !show_bot_controls })}>
+                    {!is_open && <RunPanel hide_run_controls={!show_bot_controls} />}
                 </div>
             </MobileWrapper>
             <GlobalStatus has_bot_bar={show_bot_controls} />
-            <FloatingScanner
-                lifted={show_bot_controls}
-                beside_drawer={isDesktop && is_drawer_open && [DBOT_TABS.BOT_BUILDER, DBOT_TABS.CHART].includes(active_tab)}
-            />
+            <FloatingScanner lifted={show_bot_controls} beside_drawer={isDesktop && is_drawer_open} />
             <Dialog
                 cancel_button_text={cancel_button_text || localize('Cancel')}
                 className='dc-dialog__wrapper--fixed'

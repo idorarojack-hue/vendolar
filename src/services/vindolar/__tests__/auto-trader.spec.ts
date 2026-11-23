@@ -100,7 +100,9 @@ describe('AutoTrader session', () => {
 
         sendTick();
         await flush();
-        expect(buyContract).toHaveBeenLastCalledWith(expect.objectContaining({ amount: 1, contract_type: 'DIGITEVEN' }));
+        expect(buyContract).toHaveBeenLastCalledWith(
+            expect.objectContaining({ amount: 1, contract_type: 'DIGITEVEN' })
+        );
         closeContract(1, -1);
         expect(trader.getState().current_stake).toBe(2);
         expect(trader.getState().status).toBe('waiting');

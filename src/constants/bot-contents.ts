@@ -19,6 +19,7 @@ export const tabs_title: TTabsTitle = Object.freeze({
 export const NAV_TABS = [
     { key: 'DASHBOARD', id: 'id-dbot-dashboard', hash: 'dashboard', label: 'Dashboard' },
     { key: 'BOT_BUILDER', id: 'id-bot-builder', hash: 'bot_builder', label: 'Bot Builder' },
+    { key: 'DCIRCLES', id: 'id-dcircles', hash: 'dcircles', label: 'DCircles' },
     { key: 'AUTO_STRATEGIES', id: 'id-auto-strategies', hash: 'auto_strategies', label: 'Auto Trading' },
     { key: 'RECOVERY_TRADER', id: 'id-recovery-trader', hash: 'recovery_trader', label: 'TickPulse' },
     { key: 'STRATEGY_TESTER', id: 'id-strategy-tester', hash: 'strategy_tester', label: 'Confluence AI' },

@@ -145,14 +145,25 @@ export const runBacktest = ({
         session_trades = 0;
         stake = settings.stake;
         strategy = createStrategy();
-        session_state = { ...session_state, profit: 0, consecutive_losses: 0, current_stake: stake, last_result: undefined };
+        session_state = {
+            ...session_state,
+            profit: 0,
+            consecutive_losses: 0,
+            current_stake: stake,
+            last_result: undefined,
+        };
     };
 
     let i = Math.max(warmup, 0);
     let stopped = false;
     while (i < ticks.length - 1 && !stopped) {
         const window = ticks.slice(Math.max(0, i + 1 - strategy.history), i + 1);
-        const decision = strategy.decide({ symbol, ticks: window, markets: new Map([[symbol, window]]), session: session_state });
+        const decision = strategy.decide({
+            symbol,
+            ticks: window,
+            markets: new Map([[symbol, window]]),
+            session: session_state,
+        });
         if (!decision) {
             i += 1;
             continue;
@@ -193,7 +204,16 @@ export const runBacktest = ({
         max_drawdown = Math.max(max_drawdown, peak - balance);
         losing_streak = won ? 0 : losing_streak + 1;
         longest_losing_streak = Math.max(longest_losing_streak, losing_streak);
-        trades.push({ index: entry_index, contract_type: decision.contract_type, digit: decision.digit, stake, payout_ratio: ratio, won, profit, balance });
+        trades.push({
+            index: entry_index,
+            contract_type: decision.contract_type,
+            digit: decision.digit,
+            stake,
+            payout_ratio: ratio,
+            won,
+            profit,
+            balance,
+        });
         equity.push(balance);
 
         const result = won ? 'won' : 'lost';
@@ -203,7 +223,10 @@ export const runBacktest = ({
             last_result: result,
             consecutive_losses: won ? 0 : session_state.consecutive_losses + 1,
         };
-        strategy.onResult?.({ id: trades.length, time: 0, symbol, contract_type: decision.contract_type, stake, profit, result }, session_state);
+        strategy.onResult?.(
+            { id: trades.length, time: 0, symbol, contract_type: decision.contract_type, stake, profit, result },
+            session_state
+        );
         stake = nextStake({ ...settings, currency: '' }, stake, result);
         session_state = { ...session_state, current_stake: stake };
 
@@ -220,7 +243,8 @@ export const runBacktest = ({
         // Like the live engine: the result arrives with the exit tick, the next decision is on the tick after.
         i = exit_index + 1;
     }
-    if (session_trades > 0) sessions.push({ trades: session_trades, profit: round2(session_profit), ended: 'End of data' });
+    if (session_trades > 0)
+        sessions.push({ trades: session_trades, profit: round2(session_profit), ended: 'End of data' });
 
     const total_staked = round2(trades.reduce((s, t) => s + t.stake, 0));
     const win_count = trades.filter(t => t.won).length;

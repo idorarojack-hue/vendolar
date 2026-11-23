@@ -217,7 +217,7 @@ $vd-amber: var(--vd-warn);
 .vd-account-badge {
     padding: 0.8rem 1.2rem;
     border-radius: 0.8rem;
-    background: rgb(255 145 54 / 12%);
+    background: rgb(var(--vd-accent-rgb) / 12%);
     color: $vd-teal-dark;
     font-size: 1.3rem;
     font-weight: 700;
@@ -461,11 +461,11 @@ $vd-amber: var(--vd-warn);
         transition: filter 0.15s ease;
 
         &--up {
-            background: $vd-teal;
+            background: var(--vd-teal);
         }
 
         &--down {
-            background: $vd-navy;
+            background: var(--vd-red);
         }
 
         &:hover:not(:disabled) {
@@ -531,7 +531,7 @@ $vd-amber: var(--vd-warn);
     }
 
     &--info {
-        background: rgb(255 145 54 / 12%);
+        background: rgb(var(--vd-accent-rgb) / 12%);
         color: $vd-teal-dark;
     }
 }
@@ -606,7 +606,7 @@ $vd-amber: var(--vd-warn);
     }
 
     &--won {
-        border-inline-start-color: $vd-teal;
+        border-inline-start-color: var(--vd-teal);
     }
 
     &--lost {
@@ -685,10 +685,99 @@ $vd-amber: var(--vd-warn);
     font-variant-numeric: tabular-nums;
 
     &--up {
-        color: $vd-teal-dark;
+        color: var(--vd-up);
     }
 
     &--down {
         color: $vd-red;
+    }
+}
+
+// Position actions: TP / SL editor, deal cancellation, sell
+.vd-position__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.6rem;
+
+    @include mobile-screen {
+        grid-column: 1 / -1;
+        justify-content: stretch;
+
+        > button {
+            flex: 1;
+        }
+    }
+}
+
+.vd-position__action {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--border-normal);
+    border-radius: 0.6rem;
+    background: transparent;
+    color: var(--text-prominent);
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+        border-color: var(--text-general);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+    }
+}
+
+.vd-position__limits {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    grid-column: 1 / -1;
+    padding-top: 0.8rem;
+    border-top: 1px dashed var(--border-normal);
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        font-size: 1.1rem;
+
+        span {
+            color: var(--text-general);
+            font-weight: 600;
+        }
+
+        input {
+            width: 11rem;
+            height: 3.2rem;
+            padding: 0 0.8rem;
+            border: 1px solid var(--border-normal);
+            border-radius: 0.4rem;
+            background: var(--general-main-1);
+            color: var(--text-prominent);
+        }
+
+        small {
+            color: var(--text-general);
+        }
+    }
+
+    button {
+        height: 3.2rem;
+        padding: 0 1.4rem;
+        border: none;
+        border-radius: 0.4rem;
+        background: var(--vd-teal, #4db6ac);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+
+        &.is-plain {
+            border: 1px solid var(--border-normal);
+            background: transparent;
+            color: var(--text-prominent);
+        }
     }
 }

@@ -18,7 +18,7 @@ $vd-amber: var(--vd-warn);
 }
 
 .is-up {
-    color: $vd-teal-dark;
+    color: var(--vd-up);
 }
 
 .is-down {
@@ -134,7 +134,7 @@ $vd-amber: var(--vd-warn);
         white-space: nowrap;
 
         &--teal {
-            background: rgb(255 145 54 / 15%);
+            background: rgb(var(--vd-accent-rgb) / 15%);
             color: $vd-teal-dark;
         }
 
@@ -357,7 +357,7 @@ $vd-amber: var(--vd-warn);
     }
 
     &--info {
-        background: rgb(255 145 54 / 12%);
+        background: rgb(var(--vd-accent-rgb) / 12%);
         color: $vd-teal-dark;
     }
 }
@@ -552,7 +552,7 @@ $vd-amber: var(--vd-warn);
         white-space: nowrap;
 
         &.is-up {
-            color: $vd-teal-dark;
+            color: var(--vd-up);
         }
 
         &.is-down {
@@ -656,7 +656,7 @@ $vd-amber: var(--vd-warn);
     }
 
     &--met {
-        background: rgb(255 145 54 / 12%);
+        background: rgb(var(--vd-accent-rgb) / 12%);
 
         strong {
             color: $vd-teal-dark;
@@ -737,7 +737,7 @@ $vd-amber: var(--vd-warn);
     }
 
     strong {
-        color: #fff;
+        color: var(--vd-text);
         font-size: 1.8rem;
         font-weight: 800;
         line-height: 1.2;
@@ -761,7 +761,7 @@ $vd-amber: var(--vd-warn);
     flex-direction: column;
     gap: 0.8rem;
     padding: 1.2rem;
-    border: 1px solid rgb(247 244 242 / 10%);
+    border: 1px solid rgb(var(--vd-ink) / 10%);
     border-radius: 1rem;
     background: rgb(0 0 0 / 22%);
 }
@@ -838,7 +838,7 @@ $vd-amber: var(--vd-warn);
 // Market Scanner
 .vd-scanner {
     tr.is-ready td {
-        background: rgb(255 145 54 / 10%);
+        background: rgb(var(--vd-accent-rgb) / 10%);
     }
 
     td strong {
@@ -872,7 +872,7 @@ $vd-amber: var(--vd-warn);
         font-weight: 700;
 
         &.is-on {
-            background: rgb(255 145 54 / 18%);
+            background: rgb(var(--vd-accent-rgb) / 18%);
             color: $vd-teal-dark;
         }
     }
@@ -914,12 +914,13 @@ $vd-amber: var(--vd-warn);
         font-size: 1.2rem;
     }
 
+    // First side teal, second side red (like the reference buy buttons)
     &--up {
-        background: var(--vd-orange);
+        background: var(--vd-teal);
     }
 
     &--down {
-        background: var(--vd-orange);
+        background: var(--vd-red);
     }
 
     &__payout {
@@ -1065,7 +1066,7 @@ $vd-amber: var(--vd-warn);
         gap: 0.8rem;
         height: 2.8rem;
         padding: 0 1.2rem;
-        border: 1px solid rgb(255 145 54 / 50%);
+        border: 1px solid rgb(var(--vd-accent-rgb) / 50%);
         border-radius: 10rem;
         background: var(--general-main-1);
         color: var(--text-prominent);
@@ -1162,13 +1163,13 @@ $vd-amber: var(--vd-warn);
     max-height: calc(100vh - 3.2rem);
     overflow-y: auto;
     padding: 2.8rem;
-    border: 1px solid #754013;
+    border: 1px solid var(--vd-border);
     border-radius: 1.4rem;
-    background: #2a1406;
-    color: #ddd6cf;
+    background: var(--vd-panel);
+    color: var(--vd-text);
     font-size: 1.4rem;
     line-height: 1.6;
-    box-shadow: 0 25px 90px rgb(0 0 0 / 55%);
+    box-shadow: 0 25px 90px rgb(var(--vd-ink) / 25%);
 
     h2 {
         color: var(--vd-orange-text);
@@ -1272,7 +1273,7 @@ $vd-amber: var(--vd-warn);
     cursor: pointer;
     box-shadow:
         0 6px 18px rgb(11 31 77 / 45%),
-        0 0 0 3px rgb(255 145 54 / 45%);
+        0 0 0 3px rgb(var(--vd-accent-rgb) / 45%);
 
     &__icon {
         position: relative;
@@ -1499,7 +1500,7 @@ $vd-teal-light: var(--vd-orange);
     .vd-card__title,
     .vd-page__header h2,
     h3 {
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-card__text,
@@ -1510,7 +1511,7 @@ $vd-teal-light: var(--vd-orange);
     }
 
     .vd-field__label {
-        color: rgb(255 145 54 / 80%);
+        color: rgb(var(--vd-accent-rgb) / 80%);
     }
 
     // Cards: glass with a faint teal edge
@@ -1518,7 +1519,7 @@ $vd-teal-light: var(--vd-orange);
         border: 1px solid $vd-line;
         background: $vd-glass-strong;
         box-shadow:
-            0 0 0 1px rgb(255 255 255 / 2%) inset,
+            0 0 0 1px rgb(var(--vd-ink) / 2%) inset,
             0 18px 40px rgb(0 0 0 / 35%);
         backdrop-filter: blur(8px);
 
@@ -1526,12 +1527,12 @@ $vd-teal-light: var(--vd-orange);
             border-color: $vd-teal-light;
             box-shadow:
                 0 0 0 1px $vd-teal-light,
-                0 0 28px rgb(255 145 54 / 30%);
+                0 0 28px rgb(var(--vd-accent-rgb) / 30%);
         }
     }
 
     .vd-card__badge {
-        background: rgb(255 145 54 / 12%);
+        background: rgb(var(--vd-accent-rgb) / 12%);
         color: $vd-teal-light;
 
         &--amber {
@@ -1555,8 +1556,8 @@ $vd-teal-light: var(--vd-orange);
     .vd-number__box,
     .vd-select {
         border-color: $vd-line-soft;
-        background: rgb(255 255 255 / 5%);
-        color: #fff;
+        background: rgb(var(--vd-ink) / 5%);
+        color: var(--vd-text);
 
         &:focus-within,
         &:focus-visible {
@@ -1565,13 +1566,13 @@ $vd-teal-light: var(--vd-orange);
         }
 
         input {
-            color: #fff;
+            color: var(--vd-text);
         }
 
         option,
         optgroup {
             background: var(--vd-bar);
-            color: #fff;
+            color: var(--vd-text);
         }
     }
 
@@ -1594,29 +1595,29 @@ $vd-teal-light: var(--vd-orange);
     }
 
     .vd-segmented {
-        background: rgb(255 255 255 / 5%);
+        background: rgb(var(--vd-ink) / 5%);
         box-shadow: inset 0 0 0 1px $vd-line-soft;
     }
 
     .vd-switch {
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-switch__track {
-        background: rgb(255 255 255 / 16%);
+        background: rgb(var(--vd-ink) / 16%);
     }
 
     // Digit circles on dark
     .vd-digit__disc {
-        fill: rgb(255 255 255 / 6%);
+        fill: rgb(var(--vd-ink) / 6%);
     }
 
     .vd-digit__track {
-        stroke: rgb(255 255 255 / 12%);
+        stroke: rgb(var(--vd-ink) / 12%);
     }
 
     .vd-digit__label strong {
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-digit__label small {
@@ -1635,7 +1636,7 @@ $vd-teal-light: var(--vd-orange);
     .vd-session-stats > div,
     .vd-preset__facts,
     .vd-rule-preview {
-        background: rgb(255 255 255 / 5%);
+        background: rgb(var(--vd-ink) / 5%);
     }
 
     .vd-session-stats dt,
@@ -1648,7 +1649,7 @@ $vd-teal-light: var(--vd-orange);
     .vd-preset__facts dd,
     .vd-trade-log td,
     .vd-session__status {
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-trade-log th,
@@ -1660,7 +1661,7 @@ $vd-teal-light: var(--vd-orange);
         color: $vd-ink-soft;
 
         &--met {
-            background: rgb(255 145 54 / 18%);
+            background: rgb(var(--vd-accent-rgb) / 18%);
 
             strong {
                 color: $vd-teal-light;
@@ -1701,7 +1702,7 @@ $vd-teal-light: var(--vd-orange);
     gap: 1.6rem;
     margin-bottom: 1.6rem;
     padding: 2.4rem 2.4rem 2rem;
-    border: 1px solid rgb(255 145 54 / 18%);
+    border: 1px solid rgb(var(--vd-accent-rgb) / 18%);
     border-radius: 1.6rem;
     background: var(--vd-panel);
     box-shadow: 0 20px 48px rgb(0 0 0 / 35%);
@@ -1749,7 +1750,7 @@ $vd-teal-light: var(--vd-orange);
     }
 
     &__subtitle {
-        color: rgb(247 244 242 / 78%);
+        color: rgb(var(--vd-ink) / 78%);
         font-size: 1.5rem;
         line-height: 1.55;
     }
@@ -1772,7 +1773,7 @@ $vd-teal-light: var(--vd-orange);
         position: relative;
         overflow: hidden;
         padding: 1rem 0.9rem 0.9rem;
-        border: 1px solid rgb(247 244 242 / 14%);
+        border: 1px solid rgb(var(--vd-ink) / 14%);
         border-top: 3px solid var(--vd-stat-color, #94a3b8);
         border-radius: 0.9rem;
         background: rgb(0 0 0 / 22%);
@@ -1786,14 +1787,14 @@ $vd-teal-light: var(--vd-orange);
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: rgb(247 244 242 / 78%);
+            color: rgb(var(--vd-ink) / 78%);
             font-size: 1.15rem;
             font-weight: 600;
         }
 
         dd {
             margin-top: 0.5rem;
-            color: #fff;
+            color: var(--vd-text);
             font-size: 1.6rem;
             font-weight: 800;
         }
@@ -1860,7 +1861,7 @@ $vd-teal-light: var(--vd-orange);
 
 .vd-page--dark .vd-stat-tiles {
     > .vd-stat {
-        border: 1px solid rgb(247 244 242 / 14%);
+        border: 1px solid rgb(var(--vd-ink) / 14%);
         border-top: 3px solid var(--vd-stat-color, #94a3b8);
         background: rgb(0 0 0 / 28%);
     }
@@ -1901,7 +1902,7 @@ $vd-teal-light: var(--vd-orange);
         background: var(--vd-orange);
         color: var(--vd-on-orange);
         box-shadow:
-            0 8px 24px rgb(255 145 54 / 40%),
+            0 8px 24px rgb(var(--vd-accent-rgb) / 40%),
             0 0 0 1px rgb(255 255 255 / 25%) inset;
     }
 
@@ -1914,11 +1915,11 @@ $vd-teal-light: var(--vd-orange);
 .vd-page--dark {
     .vd-bulk__quote {
         color: var(--vd-orange);
-        text-shadow: 0 0 18px rgb(255 145 54 / 45%);
+        text-shadow: 0 0 18px rgb(var(--vd-accent-rgb) / 45%);
     }
 
     .vd-recovery__hero {
-        border: 1px solid rgb(255 145 54 / 18%);
+        border: 1px solid rgb(var(--vd-accent-rgb) / 18%);
     }
 }
 
@@ -1944,7 +1945,7 @@ select.vd-select {
     color-scheme: dark;
     cursor: pointer;
     background-color: var(--vd-field);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23f7f4f2' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231f2937' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1.2rem center;
     background-size: 1.1rem 0.7rem;
@@ -1997,7 +1998,7 @@ select.vd-select {
         font-weight: 800;
         letter-spacing: 0.04em;
         text-transform: uppercase;
-        box-shadow: 0 6px 16px rgb(255 145 54 / 30%);
+        box-shadow: 0 6px 16px rgb(var(--vd-accent-rgb) / 30%);
     }
 
     &--gold .vd-preset__open {
@@ -2009,7 +2010,7 @@ select.vd-select {
 
 .vd-page--dark .vd-preset:hover {
     box-shadow:
-        0 0 0 1px rgb(255 145 54 / 45%),
+        0 0 0 1px rgb(var(--vd-accent-rgb) / 45%),
         0 18px 40px rgb(0 0 0 / 45%);
 }
 
@@ -2031,7 +2032,7 @@ $vd-ink-soft: var(--vd-muted);
     height: 2.8rem;
     margin-bottom: 0;
     border: none;
-    border-bottom: 1px solid rgb(255 255 255 / 8%);
+    border-bottom: 1px solid rgb(var(--vd-ink) / 8%);
     border-radius: 0;
     background: var(--vd-ticker-bg);
     mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
@@ -2162,7 +2163,7 @@ $vd-ink-soft: var(--vd-muted);
     h2,
     h3,
     .vd-manual__quote strong {
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-primary-button,
@@ -2193,12 +2194,12 @@ $vd-ink-soft: var(--vd-muted);
     .vd-field__input {
         border-color: var(--vd-border-soft);
         background: var(--vd-field);
-        color: #fff;
+        color: var(--vd-text);
         border-radius: 0.8rem;
 
         input,
         option {
-            color: #fff;
+            color: var(--vd-text);
             background: var(--vd-panel);
         }
     }
@@ -2206,15 +2207,15 @@ $vd-ink-soft: var(--vd-muted);
     select.vd-select {
         border-color: var(--vd-border-soft);
         border-radius: 0.8rem;
-        color: #fff;
+        color: var(--vd-text);
         background-color: var(--vd-field);
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23f7f4f2' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231f2937' d='M1.2.8 6 5.6 10.8.8 12 2 6 8 0 2z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 1.2rem center;
         background-size: 1.1rem 0.7rem;
 
         option {
-            color: #fff;
+            color: var(--vd-text);
             background: var(--vd-panel);
         }
     }
@@ -2228,7 +2229,7 @@ $vd-ink-soft: var(--vd-muted);
     }
 
     .vd-digit__disc {
-        fill: rgb(255 255 255 / 6%);
+        fill: rgb(var(--vd-ink) / 6%);
     }
 
     .vd-digit__label strong,
@@ -2253,12 +2254,12 @@ $vd-ink-soft: var(--vd-muted);
     .vd-analysis__title h2,
     .vd-field__label,
     .vd-manual__quote span b {
-        color: #fff;
+        color: var(--vd-text);
     }
 
     .vd-live {
-        background: rgb(255 145 54 / 18%);
-        color: #ffd7ad;
+        background: rgb(var(--vd-accent-rgb) / 18%);
+        color: var(--vd-orange-text);
     }
 
     .vd-chart__line {
@@ -2266,11 +2267,11 @@ $vd-ink-soft: var(--vd-muted);
     }
 
     .vd-chart__grid line {
-        stroke: rgb(255 255 255 / 8%);
+        stroke: rgb(var(--vd-ink) / 8%);
     }
 
     .vd-chart__grid text {
-        fill: rgb(247 244 242 / 55%);
+        fill: rgb(var(--vd-ink) / 55%);
     }
 }
 
@@ -2287,7 +2288,7 @@ $vd-ink-soft: var(--vd-muted);
 .vd-page--dark,
 .vd-recovery__hero,
 .vd-tool-hero {
-    --vd-text-muted: rgb(247 244 242 / 72%);
+    --vd-text-muted: rgb(var(--vd-ink) / 72%);
 }
 
 // Loss red that passes 4.5:1 on white (was var(--vd-down) = 3.76:1)
@@ -2306,14 +2307,14 @@ $vd-ink-soft: var(--vd-muted);
 // On phones it opens in a white pop-up, so the template's dark text is kept there.
 @include desktop-screen {
     .db-info-panel {
-        color: rgb(247 244 242 / 82%);
+        color: rgb(var(--vd-ink) / 82%);
 
         .dc-text {
-            color: rgb(247 244 242 / 82%) !important;
+            color: rgb(var(--vd-ink) / 82%) !important;
         }
 
         h1.dc-text {
-            color: #fff !important;
+            color: var(--vd-text) !important;
         }
     }
 }
@@ -2338,7 +2339,7 @@ $vd-ink-soft: var(--vd-muted);
 
 @include desktop-screen {
     .db-info-panel .db-info-panel__close-action {
-        color: #fff;
+        color: var(--vd-text);
     }
 }
 
@@ -2350,12 +2351,12 @@ $vd-ink-soft: var(--vd-muted);
 
 // Footer text and icons on the dark footer (clock was 1.53:1)
 .app-footer {
-    color: rgb(247 244 242 / 75%);
+    color: rgb(var(--vd-ink) / 75%);
 
     .derivs-text__size--xs,
     .deriv-text,
     span {
-        color: rgb(247 244 242 / 75%);
+        color: rgb(var(--vd-ink) / 75%);
     }
 
     .app-footer__icon {
@@ -2364,7 +2365,7 @@ $vd-ink-soft: var(--vd-muted);
 
         svg,
         svg path {
-            fill: rgb(247 244 242 / 80%);
+            fill: rgb(var(--vd-ink) / 80%);
         }
     }
 }
@@ -2449,8 +2450,8 @@ body .run-panel #db-animation__stop-button.dc-btn {
 // Market Scanner pills and flags on the dark page (white on light grey was 1.11:1)
 .vd-page--dark {
     .vd-scanner__pill {
-        background: rgb(255 255 255 / 8%);
-        color: #fff;
+        background: rgb(var(--vd-ink) / 8%);
+        color: var(--vd-text);
     }
 
     .vd-scanner__flag {
@@ -2474,18 +2475,18 @@ body .run-panel #db-animation__stop-button.dc-btn {
     // Positions list (Hedging) on the dark page instead of a bright white card
     .vd-positions,
     .vd-position {
-        border-color: rgb(255 255 255 / 12%);
-        background: rgb(255 255 255 / 4%);
-        color: #fff;
+        border-color: rgb(var(--vd-ink) / 12%);
+        background: rgb(var(--vd-ink) / 4%);
+        color: var(--vd-text);
     }
 
     .vd-positions__summary div {
-        background: rgb(255 255 255 / 6%);
+        background: rgb(var(--vd-ink) / 6%);
     }
 
     .vd-positions__summary dd,
     .vd-position__main strong {
-        color: #fff;
+        color: var(--vd-text);
     }
 }
 
@@ -2579,12 +2580,12 @@ body .run-panel #db-animation__stop-button.dc-btn {
 // ===========================================================================
 .app-header {
     background: var(--vd-bar);
-    border-bottom-color: rgb(255 255 255 / 6%);
+    border-bottom-color: rgb(var(--vd-ink) / 6%);
 }
 
 .layout .deriv-header,
 .app-footer {
-    border-color: rgb(255 255 255 / 6%);
+    border-color: rgb(var(--vd-ink) / 6%);
 }
 
 // Edge fades of the tab strip are not needed (arrows + scrollbar show there is more).
@@ -2595,14 +2596,14 @@ body .run-panel #db-animation__stop-button.dc-btn {
 // Run + bot status pill at the bottom centre
 .main__run-strategy-wrapper {
     @include desktop-screen {
-        border: 1px solid rgb(247 244 242 / 40%);
-        background: #1a120c !important;
+        border: 1px solid rgb(255 255 255 / 25%);
+        background: var(--vd-navy-dark) !important;
         box-shadow: none !important;
     }
 
     .animation__container {
-        background-color: #1a120c !important;
-        border-color: rgb(247 244 242 / 28%);
+        background-color: var(--vd-navy-dark) !important;
+        border-color: rgb(255 255 255 / 20%);
         color: #fff;
     }
 
@@ -2615,7 +2616,7 @@ body .run-panel #db-animation__stop-button.dc-btn {
     }
 
     .animation__progress-line {
-        background-color: rgb(247 244 242 / 55%);
+        background-color: rgb(255 255 255 / 55%);
     }
 
     .animation__progress .static-circle {
@@ -2633,21 +2634,21 @@ body .run-panel #db-animation__stop-button.dc-btn {
 // Price ticker under the tab strip: "VOL 10  4847.777 ▼" cells with dividers
 .vd-ticker--strip {
     height: 3rem;
-    border-bottom: 1px solid rgb(255 255 255 / 6%);
+    border-bottom: 1px solid rgb(var(--vd-ink) / 6%);
     background: var(--vd-ticker-bg);
     mask-image: none;
 
     .vd-ticker__item {
         gap: 0.6rem;
         padding: 0 1.8rem;
-        border-inline-end: 1px solid rgb(255 255 255 / 7%);
+        border-inline-end: 1px solid rgb(var(--vd-ink) / 7%);
         font-size: 1.15rem;
         line-height: 3rem;
         letter-spacing: 0.04em;
     }
 
     .vd-ticker__name {
-        color: rgb(247 244 242 / 55%);
+        color: rgb(var(--vd-ink) / 55%);
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -2690,7 +2691,7 @@ body .run-panel #db-animation__stop-button.dc-btn {
         line-height: 1.25;
 
         strong {
-            color: #fff;
+            color: var(--vd-text);
             font-size: 1.4rem;
         }
 
@@ -2710,20 +2711,20 @@ body .run-panel #db-animation__stop-button.dc-btn {
 .vd-scanner-panel {
     border-color: var(--vd-border);
     background: var(--vd-panel);
-    color: #fff;
-    --text-prominent: #fff;
-    --text-general: #f7f4f2;
-    --vd-text-muted: #f7f4f2;
+    color: var(--vd-text);
+    --text-prominent: var(--vd-text);
+    --text-general: var(--vd-text);
+    --vd-text-muted: var(--vd-text);
 
     .vd-field__label,
     .vd-card__text {
-        color: #f7f4f2;
+        color: var(--vd-text);
         font-size: 1.4rem;
         font-weight: 700;
     }
 
     .vd-scanner-panel__row-main strong {
-        color: #fff;
+        color: var(--vd-text);
         font-size: 1.5rem;
     }
 
@@ -2789,7 +2790,7 @@ body .run-panel #db-animation__stop-button.dc-btn {
         box-shadow: inset 0 0 0 1px var(--vd-border);
 
         button {
-            color: #f7f4f2;
+            color: var(--vd-text);
 
             &.is-active {
                 background: var(--vd-orange);
@@ -2805,4 +2806,3 @@ body .run-panel #db-animation__stop-button.dc-btn {
     font-size: 1.3rem;
     font-weight: 800;
 }
-

@@ -80,7 +80,7 @@
 
         h1 {
             margin: 0;
-            color: #fff;
+            color: var(--vd-text);
             font-family: var(--vd-font-display);
             font-size: clamp(2.8rem, 3vw, 3.8rem);
             font-weight: 700;
@@ -106,7 +106,7 @@
     &__lead {
         max-width: 44rem;
         margin: 1.4rem 0 0;
-        color: #d9c9bc;
+        color: var(--vd-muted);
         font-size: 1.5rem;
         line-height: 1.65;
     }
@@ -187,7 +187,7 @@
 
         h2 {
             margin: 0;
-            color: #fff;
+            color: var(--vd-text);
             font-size: 1.4rem;
             font-weight: 700;
         }
@@ -233,7 +233,7 @@
         align-items: baseline;
         gap: 0.8rem;
         margin: 0.2rem 0 0;
-        color: #fff;
+        color: var(--vd-text);
         font-size: 2.6rem;
         font-weight: 800;
         font-variant-numeric: tabular-nums;
@@ -315,7 +315,7 @@
         inset-inline-end: 0;
         padding: 0.1rem 0.4rem;
         border-radius: 0.3rem;
-        color: #fff;
+        color: var(--vd-text);
         font-size: 1rem;
         font-weight: 700;
         transform: translateY(-50%);
@@ -368,7 +368,7 @@
         border: 1px solid var(--vd-border);
         border-radius: 1.2rem;
         background: var(--vd-panel);
-        color: #fff;
+        color: var(--vd-text);
         font: inherit;
         text-align: start;
         cursor: pointer;
@@ -491,8 +491,8 @@
         }
 
         &--orange {
-            border-color: rgb(249 115 22 / 35%);
-            background: rgb(249 115 22 / 14%);
+            border-color: rgb(var(--vd-accent-rgb) / 35%);
+            background: rgb(var(--vd-accent-rgb) / 14%);
             color: var(--vd-orange-text);
         }
     }

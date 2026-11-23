@@ -3,7 +3,7 @@
  * replay any of them with exactly the same logic the live tools use.
  */
 import type { TStrategy } from './auto-trader';
-import { createDigitStrategy, getPreset, PATTERN_PRESETS, parityRule, rangeBounceRule } from './digit-strategies';
+import { createDigitStrategy, getPreset, parityRule, PATTERN_PRESETS, rangeBounceRule } from './digit-strategies';
 import { createPriceStrategy, PRICE_STRATEGIES } from './indicators';
 import { DIGIT_STRATEGIES } from './stat-strategies';
 
@@ -23,7 +23,13 @@ const always =
         name,
         markets: [symbol],
         history: 1,
-        decide: () => ({ symbol, contract_type, digit, duration: contract_type === 'CALL' || contract_type === 'PUT' ? duration : 1, reason: 'Every opportunity' }),
+        decide: () => ({
+            symbol,
+            contract_type,
+            digit,
+            duration: contract_type === 'CALL' || contract_type === 'PUT' ? duration : 1,
+            reason: 'Every opportunity',
+        }),
     });
 
 export const STRATEGY_CATALOG: TCatalogEntry[] = [
@@ -46,7 +52,12 @@ export const STRATEGY_CATALOG: TCatalogEntry[] = [
         name: 'Recovery Trader · Over 4 / Under 5',
         description: '3 digits in a row at 0-4 → Over 4, at 5-9 → Under 5. After a loss, waits for 6.',
         create: ({ symbol }) =>
-            createDigitStrategy({ name: 'Recovery Trader', markets: [symbol], rule: rangeBounceRule(3, 4, 5), recovery_rule: rangeBounceRule(6, 4, 5) }),
+            createDigitStrategy({
+                name: 'Recovery Trader',
+                markets: [symbol],
+                rule: rangeBounceRule(3, 4, 5),
+                recovery_rule: rangeBounceRule(6, 4, 5),
+            }),
     },
     {
         id: 'recovery-even-odd',
@@ -54,14 +65,20 @@ export const STRATEGY_CATALOG: TCatalogEntry[] = [
         name: 'Recovery Trader · Even / Odd',
         description: '3 even digits in a row → Odd, 3 odd → Even. After a loss, waits for 6.',
         create: ({ symbol }) =>
-            createDigitStrategy({ name: 'Recovery Trader', markets: [symbol], rule: parityRule(3, 'swap'), recovery_rule: parityRule(6, 'swap') }),
+            createDigitStrategy({
+                name: 'Recovery Trader',
+                markets: [symbol],
+                rule: parityRule(3, 'swap'),
+                recovery_rule: parityRule(6, 'swap'),
+            }),
     },
     {
         id: 'scanner-default',
         group: 'Market Scanner',
         name: 'Scanner setup · Over 2 / Under 7',
         description: '3 digits in a row at 0-2 → Over 2; 3 digits at 7-9 → Under 7.',
-        create: ({ symbol }) => createDigitStrategy({ name: 'Market Scanner', markets: [symbol], rule: rangeBounceRule(3, 2, 7) }),
+        create: ({ symbol }) =>
+            createDigitStrategy({ name: 'Market Scanner', markets: [symbol], rule: rangeBounceRule(3, 2, 7) }),
     },
     ...PRICE_STRATEGIES.map(s => ({
         id: `auto-${s.id}`,

@@ -18,7 +18,9 @@ describe('toContractParameters', () => {
     it('adds the digit as barrier for Over/Under and Matches/Differs only', () => {
         expect(toContractParameters({ ...base, contract_type: 'DIGITOVER', duration: 1, digit: 4 }).barrier).toBe('4');
         expect(toContractParameters({ ...base, contract_type: 'DIGITDIFF', duration: 1, digit: 0 }).barrier).toBe('0');
-        expect(toContractParameters({ ...base, contract_type: 'DIGITEVEN', duration: 1, digit: 4 }).barrier).toBeUndefined();
+        expect(
+            toContractParameters({ ...base, contract_type: 'DIGITEVEN', duration: 1, digit: 4 }).barrier
+        ).toBeUndefined();
     });
 
     it('builds an accumulator without duration and with optional take profit', () => {

@@ -4,48 +4,59 @@
 
 // ---------------------------------------------------------------------------
 // Vindolar palette: the one place to change the site's colours.
-// Dark brown and orange, flat colours (no gradients) inside the workspace.
+// Light theme: white pages, navy tab strip, magenta accent (active tab, main buttons),
+// teal for up / buy and red for down / sell.
 // ---------------------------------------------------------------------------
 :root {
-    // Surfaces, darkest to lightest (sampled from the MarketGuides-style reference)
-    --vd-bar: #0e0e0e; // header and footer
-    --vd-ticker-bg: #070a15; // price ticker
-    --vd-bg: #1b0d04; // page background
-    --vd-field: #221004; // inputs, chart wells
-    --vd-panel: #321707; // cards and panels
-    --vd-panel-hover: #3b1c09;
-    --vd-hero: #401d07; // dashboard hero card
-    --vd-nav: #5f2b08; // tab strip
-    --vd-icon-bg: #542a0e; // icon tiles, chips
+    // Surfaces
+    --vd-bar: #fff; // header and footer
+    --vd-ticker-bg: #f3f5fa; // price ticker
+    --vd-bg: #f3f5f9; // page background around the cards
+    --vd-field: #f7f8fb; // inputs, chart wells
+    --vd-panel: #fff; // cards and panels
+    --vd-panel-hover: #f1f3f8;
+    --vd-hero: #f6f7fb; // dashboard hero card
+    --vd-nav: #1c315f; // tab strip (navy)
+    --vd-icon-bg: #eef1f7; // icon tiles, chips
 
     // Lines
-    --vd-border: #51321f;
-    --vd-border-soft: #3d2414;
-    --vd-border-strong: #8a4a1c;
+    --vd-border: #dde2ea;
+    --vd-border-soft: #eaedf3;
+    --vd-border-strong: #c2c9d6;
 
-    // Accent
-    --vd-orange: #f97316; // buttons, active tab, highlights
-    --vd-orange-hover: #fb8534;
-    --vd-orange-text: #fb8c3c; // orange text and headings
-    --vd-on-orange: #fff; // text on orange buttons
-    --vd-cyan: #15c9ef;
+    // Accent (the token keeps its old "orange" name so every component picks it up)
+    --vd-orange: #8e0c52; // magenta: buttons, active tab, highlights
+    --vd-orange-hover: #a3135f;
+    --vd-orange-text: #9b0f57; // accent text and headings
+    --vd-on-orange: #fff; // text on accent buttons
+    --vd-cyan: #3aa89d;
+
+    // Brand extras
+    --vd-navy: #1c315f;
+    --vd-navy-dark: #1f1d3a;
+    --vd-teal: #4db6ac;
+    --vd-red: #e8424f;
+
+    // RGB triplets for translucent tints: rgb(var(--vd-ink) / 10%)
+    --vd-ink: 31 41 55; // dark text colour
+    --vd-accent-rgb: 142 12 82; // magenta
 
     // Text
-    --vd-text: #f7f4f2;
-    --vd-muted: #b5a397;
-    --vd-faint: #8e7f74;
+    --vd-text: #1f2937;
+    --vd-muted: #5b6472;
+    --vd-faint: #8a93a3;
 
     // Meaning
-    --vd-up: #20c58c;
-    --vd-down: #f06a50;
-    --vd-tick-up: #4da3ff; // ticker: price went up
-    --vd-tick-down: #ff5b3a; // ticker: price went down
-    --vd-warn: #ffcb05;
-    --vd-on-warn: #231600;
+    --vd-up: #2a9d92; // teal
+    --vd-down: #e0434f; // red
+    --vd-tick-up: #2a9d92; // ticker: price went up
+    --vd-tick-down: #e0434f; // ticker: price went down
+    --vd-warn: #f5b300;
+    --vd-on-warn: #2a1f00;
 
-    // Secondary (dark) buttons
-    --vd-dark-btn: #351b08;
-    --vd-dark-btn-border: #51321f;
+    // Secondary (dark navy) buttons
+    --vd-dark-btn: #1f1d3a;
+    --vd-dark-btn-border: #1f1d3a;
 
     // Type
     --vd-font-display: 'Space Grotesk', 'DM Sans', sans-serif;

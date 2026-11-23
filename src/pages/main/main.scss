@@ -939,5 +939,46 @@ $vd-nav-bg-end: var(--vd-nav);
         .run-panel-tab__content {
             height: calc(100vh - 49.6rem) !important;
         }
+
+        // Closed: slide out but keep the 16px handle on screen so the panel can be reopened from any tab.
+        .run-panel__container:not(.dc-drawer--open) {
+            transform: translateX(calc(100% - 16px)) !important;
+        }
+
+        // The handle: a visible strip with the chevrons, in the brand orange
+        .dc-drawer__toggle {
+            border-radius: 0.6rem 0 0 0.6rem;
+            background: var(--vd-orange, #ff7a1a);
+            cursor: pointer;
+
+            &:hover {
+                filter: brightness(1.08);
+            }
+
+            .dc-drawer__toggle-icon {
+                fill: #fff;
+                color: #fff;
+            }
+        }
+
+        // Tool tabs have no Run bar at the bottom, so the panel can run further down.
+        &.vd-run-panel-slot--tools {
+            .run-panel__container {
+                height: calc(100vh - 16rem) !important;
+            }
+
+            .run-panel__content .dc-tabs__content,
+            .run-panel-tab__content {
+                height: calc(100vh - 42.2rem) !important;
+            }
+        }
+    }
+}
+
+// Tool tabs: keep the page clear of the open run panel on the right.
+.main--run-panel-open .main__container .dc-tabs__content--main__tabs {
+    @include desktop-screen {
+        padding-inline-end: calc(36.6rem + 2.4rem);
+        transition: padding 0.25s ease;
     }
 }

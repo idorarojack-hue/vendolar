@@ -233,6 +233,36 @@ export class DerivWSAccountsService {
     }
 
     /**
+     * Puts a demo account back to its starting balance (10,000 USD).
+     * POST options/accounts/{accountId}/reset-demo-balance — demo accounts only; 200 has no body.
+     * @param accessToken Bearer token from OAuth authentication
+     * @param accountId Demo account ID (same as the login ID, e.g. "DOT…")
+     */
+    static async resetDemoBalance(accessToken: string, accountId: string): Promise<void> {
+        const baseURL = this.getDerivWSBaseURL();
+        const optionsDir = brandConfig.platform.derivws.directories.options;
+        const endpoint = `${baseURL}${optionsDir}accounts/${encodeURIComponent(accountId)}/reset-demo-balance`;
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            let message = `${response.status} ${response.statusText}`;
+            try {
+                const body = await response.json();
+                message = body?.errors?.[0]?.message ?? body?.error?.message ?? body?.message ?? message;
+            } catch {
+                // No JSON body: keep the status text.
+            }
+            throw new Error(message);
+        }
+    }
+
+    /**
      * Complete flow to get authenticated WebSocket URL with optimized caching
      * 1. Check if accounts are already in sessionStorage (skip fetch on refresh)
      * 2. If not in storage, fetch accounts list
@@ -265,8 +295,7 @@ export class DerivWSAccountsService {
             // localStorage before triggering a WebSocket regeneration, so we honour
             // that selection here instead of always falling back to accounts[0].
             const activeLoginId = localStorage.getItem('active_loginid');
-            const targetAccount =
-                (activeLoginId && accounts.find(a => a.account_id === activeLoginId)) || accounts[0];
+            const targetAccount = (activeLoginId && accounts.find(a => a.account_id === activeLoginId)) || accounts[0];
 
             // Step 4: Fetch OTP and WebSocket URL for the resolved account (always fresh OTP)
             const websocketURL = await this.fetchOTPWebSocketURL(accessToken, targetAccount.account_id);

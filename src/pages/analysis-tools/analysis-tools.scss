@@ -87,7 +87,7 @@ $vd-amber: var(--vd-warn);
     gap: 0.6rem;
     padding: 0.3rem 1rem;
     border-radius: 10rem;
-    background: rgb(255 145 54 / 15%);
+    background: rgb(var(--vd-accent-rgb) / 15%);
     color: $vd-teal-dark;
     font-size: 1.2rem;
     font-weight: 700;
@@ -506,11 +506,11 @@ $vd-rank-low: var(--vd-down);
         font-variant-numeric: tabular-nums;
 
         &--up {
-            color: var(--vd-orange);
+            color: var(--vd-up);
         }
 
         &--down {
-            color: #fca5a5;
+            color: var(--vd-down);
         }
     }
 

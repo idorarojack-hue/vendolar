@@ -41,7 +41,9 @@ export const runStrategyTest = async ({
     let ticks = cached && Date.now() - cached.time < CACHE_MS ? cached.ticks : undefined;
     if (!ticks) {
         onProgress?.(`Loading past ticks… 0 / ${tick_count}`);
-        ticks = await marketData.fetchTickHistory(symbol, tick_count, loaded => onProgress?.(`Loading past ticks… ${loaded} / ${tick_count}`));
+        ticks = await marketData.fetchTickHistory(symbol, tick_count, loaded =>
+            onProgress?.(`Loading past ticks… ${loaded} / ${tick_count}`)
+        );
         tick_cache.set(cache_key, { ticks, time: Date.now() });
     }
 
@@ -63,7 +65,14 @@ export const runStrategyTest = async ({
         // eslint-disable-next-line no-await-in-loop
         const ratios = await Promise.all(
             outcome.missing.map(d =>
-                getPayoutRatio({ contract_type: d.contract_type, symbol, amount: settings.stake, currency, duration: d.duration, digit: d.digit })
+                getPayoutRatio({
+                    contract_type: d.contract_type,
+                    symbol,
+                    amount: settings.stake,
+                    currency,
+                    duration: d.duration,
+                    digit: d.digit,
+                })
             )
         );
         outcome.missing.forEach((d, i) => payouts.set(payoutKey(d), ratios[i]));
